@@ -18,6 +18,8 @@ namespace SpaceMiner
         private SpriteFont orbitron;
         private SpriteFont exo;
 
+        private string title = "Space Miner";
+
         public SpaceMinerGame()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -32,6 +34,8 @@ namespace SpaceMiner
             _graphics.PreferredBackBufferWidth = 960;
             _graphics.PreferredBackBufferHeight = 540;
             _graphics.ApplyChanges();
+
+            Window.Title = title;
 
             base.Initialize();
         }
@@ -65,7 +69,6 @@ namespace SpaceMiner
             // Draw here
             _spriteBatch.Begin();
 
-            string title = "Space Miner";
             Vector2 titleSize = orbitron.MeasureString(title);
 
             _spriteBatch.DrawString(orbitron, title, new Vector2((_graphics.PreferredBackBufferWidth / 2) - (titleSize.X / 2), 
