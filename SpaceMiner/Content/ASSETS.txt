@@ -1,3 +1,7 @@
 Fonts/Exo - Copyright 2017 The Exo Project Authors (https://github.com/NDISCOVER/Exo-1.0) and licensed under the SIL Open Font License, Version 1.1.
 
 Fonts/Orbitron - Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron) and licensed under the SIL Open Font License, Version 1.1.
+
+Sprites/Asteroid - Copyright 2018 IgalBlech on OpenGameArt.org (https://opengameart.org/content/spinning-asteroid-animation) and released into the public domain.
+
+All other sprites in the Sprites folder are Copyright 2022 Andrew Booze and released under the Creative Commons Attribution-ShareAlike 4.0 International license (https://creativecommons.org/licenses/by-sa/4.0/).

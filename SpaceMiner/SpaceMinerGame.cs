@@ -7,6 +7,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace SpaceMiner
 {
@@ -18,7 +19,11 @@ namespace SpaceMiner
         private SpriteFont orbitron;
         private SpriteFont exo;
 
+        private Texture2D power, miner, miningLaser, asteroid, oRing;
+
         private string title = "Space Miner";
+        private double animationTimer;
+        private short animationFrame = 1;
 
         public SpaceMinerGame()
         {
@@ -48,6 +53,13 @@ namespace SpaceMiner
             // Load fonts
             orbitron = Content.Load<SpriteFont>("Fonts/Orbitron");
             exo = Content.Load<SpriteFont>("Fonts/Exo");
+
+            // Load sprites
+            power = Content.Load<Texture2D>("Sprites/Solar Power Plant");
+            miner = Content.Load<Texture2D>("Sprites/Miner");
+            miningLaser = Content.Load<Texture2D>("Sprites/Mining Laser");
+            asteroid = Content.Load<Texture2D>("Sprites/Asteroid");
+            oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
         }
 
         protected override void Update(GameTime gameTime)
@@ -64,7 +76,7 @@ namespace SpaceMiner
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.DarkBlue);
 
             // Draw here
             _spriteBatch.Begin();
@@ -75,10 +87,54 @@ namespace SpaceMiner
                 5), Color.White);
 
             _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
+            
+            // TODO: Abstract these into classes
+            _spriteBatch.Draw(power, new Vector2(250, 200), Color.White);
+            _spriteBatch.Draw(miner, new Vector2(475, 200), Color.White);
+            DrawLine(_spriteBatch, new Vector2(475 + 16, 200 + 16), new Vector2(500 + 64, 200 + 64), miningLaser);
+            _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
+
+            // Update animation timer
+            animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+
+            // Update animation frame
+            if (animationTimer > 0.2)
+            {
+                animationFrame++;
+
+                if (animationFrame > 3)
+                {
+                    animationFrame = 1;
+                }
+
+                animationTimer -= 0.2;
+            }
+
+            // Draw the asteroid
+            var asteroidSource = new Rectangle(animationFrame * 128, (animationFrame % 8) * 128, 128, 128);
+            _spriteBatch.Draw(asteroid, new Vector2(500, 200), asteroidSource, Color.White);
 
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// Draws a line between two points. Originally from a Stack Overflow answer by Cyral 
+        /// (https://stackoverflow.com/a/16407171/10906388) licensed under CC BY-SA 3.0.
+        /// </summary>
+        /// <param name="spriteBatch">The SpriteBatch instance to draw with</param>
+        /// <param name="begin">The beginning point</param>
+        /// <param name="end">The ending point</param>
+        /// <param name="texture">The texture to draw</param>
+        /// <param name="width">The width to draw the line, which defaults to one.</param>
+        public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Texture2D texture, int width = 1)
+        {
+            Rectangle r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
+            Vector2 v = Vector2.Normalize(begin - end);
+            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
+            if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
+            spriteBatch.Draw(texture, r, null, Color.White, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 }
