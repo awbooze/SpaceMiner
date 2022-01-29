@@ -1,0 +1,3 @@
+Fonts/Exo - Copyright 2017 The Exo Project Authors (https://github.com/NDISCOVER/Exo-1.0) and licensed under the SIL Open Font License, Version 1.1.
+
+Fonts/Orbitron - Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron) and licensed under the SIL Open Font License, Version 1.1.
