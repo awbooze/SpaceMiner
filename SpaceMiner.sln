@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceMiner", "SpaceMiner\SpaceMiner.csproj", "{33CA52C1-A33B-41EA-8990-B11585EF474A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{33CA52C1-A33B-41EA-8990-B11585EF474A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33CA52C1-A33B-41EA-8990-B11585EF474A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33CA52C1-A33B-41EA-8990-B11585EF474A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33CA52C1-A33B-41EA-8990-B11585EF474A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {944DCA29-1688-458B-A99C-EDD73C45D8D8}
+	EndGlobalSection
+EndGlobal
