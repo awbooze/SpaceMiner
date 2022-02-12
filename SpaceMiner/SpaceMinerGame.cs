@@ -7,6 +7,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SpaceMiner.Sprites;
 using System;
 
 namespace SpaceMiner
@@ -19,7 +20,9 @@ namespace SpaceMiner
         private SpriteFont orbitron;
         private SpriteFont exo;
 
-        private Texture2D power, miner, miningLaser, asteroid, oRing;
+        private Texture2D power, miningLaser, asteroid, oRing;
+
+        private MinerSprite miner;
 
         private string title = "Space Miner";
         private double animationTimer;
@@ -42,6 +45,9 @@ namespace SpaceMiner
 
             Window.Title = title;
 
+            // Initialize Sprites
+            miner = new MinerSprite(new Vector2(475, 200), true);
+
             base.Initialize();
         }
 
@@ -54,9 +60,9 @@ namespace SpaceMiner
             orbitron = Content.Load<SpriteFont>("Fonts/Orbitron");
             exo = Content.Load<SpriteFont>("Fonts/Exo");
 
-            // Load sprites
+            // Load sprite content
             power = Content.Load<Texture2D>("Sprites/Solar Power Plant");
-            miner = Content.Load<Texture2D>("Sprites/Miner");
+            miner.LoadContent(Content);
             miningLaser = Content.Load<Texture2D>("Sprites/Mining Laser");
             asteroid = Content.Load<Texture2D>("Sprites/Asteroid");
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
@@ -70,6 +76,7 @@ namespace SpaceMiner
             }
 
             // TODO: Add your update logic here
+            miner.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -90,8 +97,8 @@ namespace SpaceMiner
             
             // TODO: Abstract these into classes
             _spriteBatch.Draw(power, new Vector2(250, 200), Color.White);
-            _spriteBatch.Draw(miner, new Vector2(475, 200), Color.White);
-            DrawLine(_spriteBatch, new Vector2(475 + 16, 200 + 16), new Vector2(500 + 64, 200 + 64), miningLaser);
+            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(500 + 64, 200 + 64), miningLaser);
+            miner.Draw(gameTime, _spriteBatch);
             _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
 
             // Update animation timer
