@@ -56,7 +56,9 @@ namespace SpaceMiner
                 // Add a pre-placed miner
                 new MinerSprite(new Vector2(475, 200), true, false),
 
-                new MinerSprite(new Vector2(525, 200), true, false)
+                new MinerSprite(new Vector2(525, 200), true, false),
+                
+                new SolarPowerSprite(new Vector2(250, 200), true, false)
             };
 
             // Add a non-pre-placed miner (will follow the cursor)
@@ -75,8 +77,6 @@ namespace SpaceMiner
             exo = Content.Load<SpriteFont>("Fonts/Exo");
 
             // Load sprite content
-            power = Content.Load<Texture2D>("Sprites/Solar Power Plant");
-            
             foreach (IPlayerStationSprite sprite in placedSpriteList)
             {
                 sprite.LoadContent(Content);
@@ -146,7 +146,6 @@ namespace SpaceMiner
             _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
             
             // TODO: Abstract these into classes
-            _spriteBatch.Draw(power, new Vector2(250, 200), Color.White);
             DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(500 + 64, 200 + 64), miningLaser);
             foreach (IPlayerStationSprite sprite in placedSpriteList)
             {
@@ -157,6 +156,7 @@ namespace SpaceMiner
             {
                 unplacedSprite.Draw(gameTime, _spriteBatch);
             }
+
             _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
 
             // Update animation timer
