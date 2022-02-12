@@ -35,6 +35,18 @@ namespace SpaceMiner.Collisions
         public float Bottom => Center.Y + (Height / 2);
 
         /// <summary>
+        /// A constructor for a BoundingRectangle which is actually a square.
+        /// </summary>
+        /// <param name="center">The center of this BoundingRectangle.</param>
+        /// <param name="width">The width and height of this BoundingRectangle.</param>
+        public BoundingRectangle(Vector2 center, float width)
+        {
+            Center = center;
+            Width = width;
+            Height = width;
+        }
+
+        /// <summary>
         /// Preferred constructor for the BoundingRectangle.
         /// </summary>
         /// <param name="center">The center of this BoundingRectangle.</param>
