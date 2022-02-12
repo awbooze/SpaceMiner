@@ -53,7 +53,7 @@ namespace SpaceMiner.Sprites
         public SolarPowerSprite(Vector2 center)
         {
             this.center = center;
-            this.Bounds = new BoundingRectangle(center, 32);
+            this.Bounds = new BoundingRectangle(center, 64);
         }
 
         public SolarPowerSprite(Vector2 center, bool placed, bool selected) : this(center)
