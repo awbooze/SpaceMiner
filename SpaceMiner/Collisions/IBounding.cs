@@ -19,10 +19,10 @@ namespace SpaceMiner.Collisions
         public Vector2 Center { get; set; }
 
         /// <summary>
-        /// Checks if this IBounding struct is colliding with another one.
+        /// Checks if this IBounding object is colliding with another one.
         /// </summary>
-        /// <param name="other">The other IBounding struct this may be colliding with.</param>
-        /// <returns>true if the two structs are colliding, false otherwise.</returns>
+        /// <param name="other">The other IBounding object this may be colliding with.</param>
+        /// <returns>true if the two objects are colliding, false otherwise.</returns>
         public bool CollidesWith(IBounding other);
     }
 }

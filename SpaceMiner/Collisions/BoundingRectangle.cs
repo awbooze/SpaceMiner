@@ -60,11 +60,11 @@ namespace SpaceMiner.Collisions
         }
 
         /// <summary>
-        /// Checks if this BoundingRectangle is colliding with another IBounding struct. Draws on ideas 
+        /// Checks if this BoundingRectangle is colliding with another IBounding object. Draws on ideas 
         /// given in the course examples, but is substantially different in operation.
         /// </summary>
-        /// <param name="other">The other IBounding struct this may be colliding with.</param>
-        /// <returns>true if the two structs are colliding, false otherwise.</returns>
+        /// <param name="other">The other IBounding object this may be colliding with.</param>
+        /// <returns>true if the two objects are colliding, false otherwise.</returns>
         public bool CollidesWith(IBounding other)
         {
             if (other is BoundingRectangle otherRectangle)
