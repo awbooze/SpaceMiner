@@ -87,7 +87,7 @@ namespace SpaceMiner.Sprites
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Color drawColor = (placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
+            Color drawColor = (Placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
             spriteBatch.Draw(texture, center - new Vector2(bounds.Radius, bounds.Radius), drawColor);
         }
     }
