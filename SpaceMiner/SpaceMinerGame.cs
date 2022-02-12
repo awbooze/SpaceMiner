@@ -30,6 +30,9 @@ namespace SpaceMiner
         private double animationTimer;
         private short animationFrame = 1;
 
+        private KeyboardState priorKeyboardState;
+        private KeyboardState currentKeyboardState;
+
         private MouseState priorMouseState;
         private MouseState currentMouseState;
 
@@ -99,12 +102,16 @@ namespace SpaceMiner
                 Exit();
             }
 
+            priorKeyboardState = currentKeyboardState;
+            currentKeyboardState = Keyboard.GetState();
+
             priorMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
 
             // Update logic here
             if (unplacedSprite != null)
             {
+                // Updates unplacedSprite.CanPlace to true, among other things
                 unplacedSprite.Update(gameTime);
             }
 
@@ -125,7 +132,18 @@ namespace SpaceMiner
                 unplacedSprite.Placed = true;
                 unplacedSprite.Selected = false;
                 placedSpriteList.Add(unplacedSprite);
-                unplacedSprite = null;
+
+                if (currentKeyboardState.IsKeyDown(Keys.LeftShift))
+                {
+                    // Place multiple sprites, so create another one
+                    unplacedSprite = new MinerSprite(new Vector2(currentMouseState.X, currentMouseState.Y), false, true);
+                    unplacedSprite.LoadContent(Content);
+                }
+                else
+                {
+                    // Only place one sprite
+                    unplacedSprite = null;
+                }
             }
 
             base.Update(gameTime);
@@ -145,18 +163,22 @@ namespace SpaceMiner
 
             _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
             
-            // TODO: Abstract these into classes
+            // TODO: Abstract these into more classes
             DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(500 + 64, 200 + 64), miningLaser);
+            
             foreach (IPlayerStationSprite sprite in placedSpriteList)
             {
+                // Draw all of the placed sprites
                 sprite.Draw(gameTime, _spriteBatch);
             }
 
             if (unplacedSprite != null)
             {
+                // Draw the unplaced sprite, if it exists
                 unplacedSprite.Draw(gameTime, _spriteBatch);
             }
 
+            // Draw the sprites I haven't abstracted yet
             _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
 
             // Update animation timer
