@@ -9,7 +9,7 @@ using System;
 
 namespace SpaceMiner.Collisions
 {
-    public struct BoundingCircle : IBounding
+    public class BoundingCircle : IBounding
     {
         /// <summary>
         /// The center of this BoundingCircle.
