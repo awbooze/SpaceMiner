@@ -7,6 +7,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using SpaceMiner.Collisions;
 using System;
 
@@ -44,11 +45,17 @@ namespace SpaceMiner.Sprites
 
         private bool placed = false;
 
-        public bool Placed => placed;
+        public bool Placed { get => placed; set => placed = value; }
+
+        public bool CanPlace { get; set; } = true;
 
         private bool powered = false;
 
         public bool Powered { get => powered; set => throw new NotImplementedException(); }
+
+        public bool Selected { get; set; }
+
+        private MouseState currentMouseState;
 
         public MinerSprite(Vector2 center)
         {
@@ -56,9 +63,10 @@ namespace SpaceMiner.Sprites
             this.Bounds = new BoundingCircle(center, 16);
         }
 
-        public MinerSprite(Vector2 center, bool prePlaced) : this(center)
+        public MinerSprite(Vector2 center, bool placed, bool selected) : this(center)
         {
-            placed = prePlaced;
+            Selected = selected;
+            this.placed = placed;
         }
 
         public void LoadContent(ContentManager content)
@@ -68,12 +76,18 @@ namespace SpaceMiner.Sprites
 
         public void Update(GameTime gameTime)
         {
-            // Nothing here just yet.
+            if (Selected && !placed)
+            {
+                currentMouseState = Mouse.GetState();
+                CanPlace = true;
+                center = new Vector2(currentMouseState.X, currentMouseState.Y);
+                Bounds.Center = center;
+            }
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Color drawColor = (placed) ? Color.White : Color.Gray;
+            Color drawColor = (placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
             spriteBatch.Draw(texture, center - new Vector2(bounds.Radius, bounds.Radius), drawColor);
         }
     }

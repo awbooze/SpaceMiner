@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpaceMiner.Sprites;
 using System;
+using System.Collections.Generic;
 
 namespace SpaceMiner
 {
@@ -22,11 +23,15 @@ namespace SpaceMiner
 
         private Texture2D power, miningLaser, asteroid, oRing;
 
-        private MinerSprite miner;
+        private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
+        private IPlayerStationSprite unplacedSprite = null;
 
         private string title = "Space Miner";
         private double animationTimer;
         private short animationFrame = 1;
+
+        private MouseState priorMouseState;
+        private MouseState currentMouseState;
 
         public SpaceMinerGame()
         {
@@ -46,7 +51,16 @@ namespace SpaceMiner
             Window.Title = title;
 
             // Initialize Sprites
-            miner = new MinerSprite(new Vector2(475, 200), true);
+            placedSpriteList = new List<IPlayerStationSprite>
+            {
+                // Add a pre-placed miner
+                new MinerSprite(new Vector2(475, 200), true, false),
+
+                new MinerSprite(new Vector2(525, 200), true, false)
+            };
+
+            // Add a non-pre-placed miner (will follow the cursor)
+            unplacedSprite = new MinerSprite(new Vector2(0, 0), false, true);
 
             base.Initialize();
         }
@@ -62,7 +76,17 @@ namespace SpaceMiner
 
             // Load sprite content
             power = Content.Load<Texture2D>("Sprites/Solar Power Plant");
-            miner.LoadContent(Content);
+            
+            foreach (IPlayerStationSprite sprite in placedSpriteList)
+            {
+                sprite.LoadContent(Content);
+            }
+
+            if (unplacedSprite != null)
+            {
+                unplacedSprite.LoadContent(Content);
+            }
+
             miningLaser = Content.Load<Texture2D>("Sprites/Mining Laser");
             asteroid = Content.Load<Texture2D>("Sprites/Asteroid");
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
@@ -75,8 +99,34 @@ namespace SpaceMiner
                 Exit();
             }
 
-            // TODO: Add your update logic here
-            miner.Update(gameTime);
+            priorMouseState = currentMouseState;
+            currentMouseState = Mouse.GetState();
+
+            // Update logic here
+            if (unplacedSprite != null)
+            {
+                unplacedSprite.Update(gameTime);
+            }
+
+            foreach (IPlayerStationSprite sprite in placedSpriteList)
+            {
+                sprite.Update(gameTime);
+
+                if (unplacedSprite != null && sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                {
+                    unplacedSprite.CanPlace = false;
+                }
+            }
+
+            if (currentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null && 
+                unplacedSprite.CanPlace)
+            {
+                // Place the player station sprite
+                unplacedSprite.Placed = true;
+                unplacedSprite.Selected = false;
+                placedSpriteList.Add(unplacedSprite);
+                unplacedSprite = null;
+            }
 
             base.Update(gameTime);
         }
@@ -98,7 +148,15 @@ namespace SpaceMiner
             // TODO: Abstract these into classes
             _spriteBatch.Draw(power, new Vector2(250, 200), Color.White);
             DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(500 + 64, 200 + 64), miningLaser);
-            miner.Draw(gameTime, _spriteBatch);
+            foreach (IPlayerStationSprite sprite in placedSpriteList)
+            {
+                sprite.Draw(gameTime, _spriteBatch);
+            }
+
+            if (unplacedSprite != null)
+            {
+                unplacedSprite.Draw(gameTime, _spriteBatch);
+            }
             _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
 
             // Update animation timer

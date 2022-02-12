@@ -25,12 +25,16 @@ namespace SpaceMiner.Sprites
         /// <summary>
         /// Whether the station has been placed or if the player is just considering placing it.
         /// </summary>
-        public bool Placed { get; }
+        public bool Placed { get; set; }
+
+        public bool CanPlace { get; set; }
 
         /// <summary>
         /// Whether the station has a power connection.
         /// </summary>
         public bool Powered { get; set; }
+
+        public bool Selected { get; set; }
 
         public void LoadContent(ContentManager content);
 
