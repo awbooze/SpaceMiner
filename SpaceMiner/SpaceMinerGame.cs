@@ -21,7 +21,7 @@ namespace SpaceMiner
         private SpriteFont orbitron;
         private SpriteFont exo;
 
-        private Texture2D power, miningLaser, asteroid, oRing;
+        private Texture2D miningLaser, asteroid, oRing;
 
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
