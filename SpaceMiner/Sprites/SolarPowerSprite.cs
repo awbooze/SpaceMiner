@@ -40,9 +40,7 @@ namespace SpaceMiner.Sprites
             }
         }
 
-        private bool placed = false;
-
-        public bool Placed { get => placed; set => placed = value; }
+        public bool Placed { get; set; }
 
         public bool CanPlace { get; set; } = true;
 
@@ -63,7 +61,7 @@ namespace SpaceMiner.Sprites
         public SolarPowerSprite(Vector2 center, bool placed, bool selected) : this(center)
         {
             Selected = selected;
-            this.placed = placed;
+            Placed = placed;
         }
 
         public void LoadContent(ContentManager content)
@@ -73,7 +71,7 @@ namespace SpaceMiner.Sprites
 
         public void Update(GameTime gameTime)
         {
-            if (Selected && !placed)
+            if (Selected && !Placed)
             {
                 currentMouseState = Mouse.GetState();
                 CanPlace = true;
