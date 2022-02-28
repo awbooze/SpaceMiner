@@ -7,6 +7,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Screens;
+using SpaceMiner.Screens;
 using SpaceMiner.Sprites;
 using System;
 using System.Collections.Generic;
@@ -16,31 +18,26 @@ namespace SpaceMiner
     public class SpaceMinerGame : Game
     {
         private GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
+        private readonly ScreenManager _screenManager;
 
-        private SpriteFont orbitron;
-        private SpriteFont exo;
+        public string GameTitle { get; private set; } = "Space Miner";
+        public int BackBufferWidth => _graphics.PreferredBackBufferWidth;
+        public int BackBufferHeight => _graphics.PreferredBackBufferHeight;
 
-        private Texture2D miningLaser, asteroid, oRing;
+        public KeyboardState PriorKeyboardState { get; private set; }
+        public KeyboardState CurrentKeyboardState { get; private set; }
 
-        private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
-        private IPlayerStationSprite unplacedSprite = null;
-
-        private string title = "Space Miner";
-        private double animationTimer;
-        private short animationFrame = 1;
-
-        private KeyboardState priorKeyboardState;
-        private KeyboardState currentKeyboardState;
-
-        private MouseState priorMouseState;
-        private MouseState currentMouseState;
+        public MouseState PriorMouseState { get; private set; }
+        public MouseState CurrentMouseState { get; private set; }
 
         public SpaceMinerGame()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            _screenManager = new ScreenManager();
+            Components.Add(_screenManager);
         }
 
         protected override void Initialize()
@@ -51,48 +48,16 @@ namespace SpaceMiner
             _graphics.PreferredBackBufferHeight = 540;
             _graphics.ApplyChanges();
 
-            Window.Title = title;
+            Window.Title = GameTitle;
 
-            // Initialize Sprites
-            placedSpriteList = new List<IPlayerStationSprite>
-            {
-                // Add a pre-placed miner
-                new MinerSprite(new Vector2(475, 200), true, false),
-
-                new MinerSprite(new Vector2(525, 200), true, false),
-                
-                new SolarPowerSprite(new Vector2(250, 200), true, false)
-            };
-
-            // Add a non-pre-placed miner (will follow the cursor)
-            unplacedSprite = new MinerSprite(new Vector2(0, 0), false, true);
-
+            _screenManager.Initialize();
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // Use this.Content to load game content
-            // Load fonts
-            orbitron = Content.Load<SpriteFont>("Fonts/Orbitron");
-            exo = Content.Load<SpriteFont>("Fonts/Exo");
-
-            // Load sprite content
-            foreach (IPlayerStationSprite sprite in placedSpriteList)
-            {
-                sprite.LoadContent(Content);
-            }
-
-            if (unplacedSprite != null)
-            {
-                unplacedSprite.LoadContent(Content);
-            }
-
-            miningLaser = Content.Load<Texture2D>("Sprites/Mining Laser");
-            asteroid = Content.Load<Texture2D>("Sprites/Asteroid");
-            oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
+            // Load the first screen
+            _screenManager.LoadScreen(new SplashScreen(this));
         }
 
         protected override void Update(GameTime gameTime)
@@ -102,50 +67,13 @@ namespace SpaceMiner
                 Exit();
             }
 
-            priorKeyboardState = currentKeyboardState;
-            currentKeyboardState = Keyboard.GetState();
+            PriorKeyboardState = CurrentKeyboardState;
+            CurrentKeyboardState = Keyboard.GetState();
 
-            priorMouseState = currentMouseState;
-            currentMouseState = Mouse.GetState();
+            PriorMouseState = CurrentMouseState;
+            CurrentMouseState = Mouse.GetState();
 
-            // Update logic here
-            if (unplacedSprite != null)
-            {
-                // Updates unplacedSprite.CanPlace to true, among other things
-                unplacedSprite.Update(gameTime);
-            }
-
-            foreach (IPlayerStationSprite sprite in placedSpriteList)
-            {
-                sprite.Update(gameTime);
-
-                if (unplacedSprite != null && sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
-                {
-                    unplacedSprite.CanPlace = false;
-                }
-            }
-
-            if (currentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null && 
-                unplacedSprite.CanPlace)
-            {
-                // Place the player station sprite
-                unplacedSprite.Placed = true;
-                unplacedSprite.Selected = false;
-                placedSpriteList.Add(unplacedSprite);
-
-                if (currentKeyboardState.IsKeyDown(Keys.LeftShift))
-                {
-                    // Place multiple sprites, so create another one
-                    unplacedSprite = new MinerSprite(new Vector2(currentMouseState.X, currentMouseState.Y), false, true);
-                    unplacedSprite.LoadContent(Content);
-                }
-                else
-                {
-                    // Only place one sprite
-                    unplacedSprite = null;
-                }
-            }
-
+            _screenManager.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -153,75 +81,8 @@ namespace SpaceMiner
         {
             GraphicsDevice.Clear(Color.DarkBlue);
 
-            // Draw here
-            _spriteBatch.Begin();
-
-            Vector2 titleSize = orbitron.MeasureString(title);
-
-            _spriteBatch.DrawString(orbitron, title, new Vector2((_graphics.PreferredBackBufferWidth / 2) - (titleSize.X / 2), 
-                5), Color.White);
-
-            _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
-            
-            // TODO: Abstract these into more classes
-            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(500 + 64, 200 + 64), miningLaser);
-            
-            foreach (IPlayerStationSprite sprite in placedSpriteList)
-            {
-                // Draw all of the placed sprites
-                sprite.Draw(gameTime, _spriteBatch);
-            }
-
-            if (unplacedSprite != null)
-            {
-                // Draw the unplaced sprite, if it exists
-                unplacedSprite.Draw(gameTime, _spriteBatch);
-            }
-
-            // Draw the sprites I haven't abstracted yet
-            _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
-
-            // Update animation timer
-            animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-
-            // Update animation frame
-            if (animationTimer > 0.2)
-            {
-                animationFrame++;
-
-                if (animationFrame > 3)
-                {
-                    animationFrame = 1;
-                }
-
-                animationTimer -= 0.2;
-            }
-
-            // Draw the asteroid
-            var asteroidSource = new Rectangle(animationFrame * 128, (animationFrame % 8) * 128, 128, 128);
-            _spriteBatch.Draw(asteroid, new Vector2(500, 200), asteroidSource, Color.White);
-
-            _spriteBatch.End();
-
+            _screenManager.Draw(gameTime);
             base.Draw(gameTime);
-        }
-
-        /// <summary>
-        /// Draws a line between two points. Originally from a Stack Overflow answer by Cyral 
-        /// (https://stackoverflow.com/a/16407171/10906388) licensed under CC BY-SA 3.0.
-        /// </summary>
-        /// <param name="spriteBatch">The SpriteBatch instance to draw with</param>
-        /// <param name="begin">The beginning point</param>
-        /// <param name="end">The ending point</param>
-        /// <param name="texture">The texture to draw</param>
-        /// <param name="width">The width to draw the line, which defaults to one.</param>
-        public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Texture2D texture, int width = 1)
-        {
-            Rectangle r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
-            Vector2 v = Vector2.Normalize(begin - end);
-            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
-            if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
-            spriteBatch.Draw(texture, r, null, Color.White, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 }
