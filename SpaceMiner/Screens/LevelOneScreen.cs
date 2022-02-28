@@ -22,10 +22,9 @@ namespace SpaceMiner.Screens
 
         private SpriteBatch _spriteBatch;
 
-        private Texture2D miningLaser, asteroid, oRing;
-        private double animationTimer;
-        private short animationFrame = 1;
+        private Texture2D miningLaser, oRing;
 
+        private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
 
@@ -37,6 +36,11 @@ namespace SpaceMiner.Screens
         public override void Initialize()
         {
             // Initialize Sprites
+            asteroidList = new List<IMinedSprite>
+            {
+                new AsteroidSprite(new Vector2(550, 250), 800)
+            };
+
             placedSpriteList = new List<IPlayerStationSprite>
             {
                 // Add a pre-placed miner
@@ -58,6 +62,11 @@ namespace SpaceMiner.Screens
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // Load sprite content
+            foreach (IMinedSprite sprite in asteroidList)
+            {
+                sprite.LoadContent(Content);
+            }
+
             foreach (IPlayerStationSprite sprite in placedSpriteList)
             {
                 sprite.LoadContent(Content);
@@ -69,7 +78,6 @@ namespace SpaceMiner.Screens
             }
 
             miningLaser = Content.Load<Texture2D>("Sprites/Mining Laser");
-            asteroid = Content.Load<Texture2D>("Sprites/Asteroid");
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
 
             base.LoadContent();
@@ -78,6 +86,11 @@ namespace SpaceMiner.Screens
         public override void Update(GameTime gameTime)
         {
             // Update logic here
+            foreach (IMinedSprite sprite in asteroidList)
+            {
+                sprite.Update(gameTime);
+            }
+
             if (unplacedSprite != null)
             {
                 // Updates unplacedSprite.CanPlace to true, among other things
@@ -122,7 +135,11 @@ namespace SpaceMiner.Screens
             _spriteBatch.Begin();
 
             // TODO: Abstract these into more classes
-            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(500 + 64, 200 + 64), miningLaser);
+            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(550, 250), miningLaser);
+            foreach (IMinedSprite sprite in asteroidList)
+            {
+                sprite.Draw(gameTime, _spriteBatch);
+            }
 
             foreach (IPlayerStationSprite sprite in placedSpriteList)
             {
@@ -138,26 +155,6 @@ namespace SpaceMiner.Screens
 
             // Draw the sprites I haven't abstracted yet
             _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
-
-            // Update animation timer
-            animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-
-            // Update animation frame
-            if (animationTimer > 0.2)
-            {
-                animationFrame++;
-
-                if (animationFrame > 3)
-                {
-                    animationFrame = 1;
-                }
-
-                animationTimer -= 0.2;
-            }
-
-            // Draw the asteroid
-            var asteroidSource = new Rectangle(animationFrame * 128, (animationFrame % 8) * 128, 128, 128);
-            _spriteBatch.Draw(asteroid, new Vector2(500, 200), asteroidSource, Color.White);
 
             _spriteBatch.End();
         }
