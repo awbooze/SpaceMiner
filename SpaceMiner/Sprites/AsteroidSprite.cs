@@ -18,6 +18,8 @@ namespace SpaceMiner.Sprites
     public class AsteroidSprite : IMinedSprite
     {
         private Texture2D texture;
+        //private Texture2D boundingCircleTexture;
+        private int size = 128;
         private double animationTimer;
         private short animationFrame = 1;
 
@@ -51,14 +53,15 @@ namespace SpaceMiner.Sprites
         public AsteroidSprite(Vector2 center, int maxMinerals)
         {
             Center = center;
+            Bounds = new BoundingCircle(center, 48);
             MaxMinerals = maxMinerals;
             CurrentMinerals = maxMinerals;
-            Bounds = new BoundingCircle(center, 64);
         }
 
         public void LoadContent(ContentManager content)
         {
             texture = content.Load<Texture2D>("Sprites/Asteroid");
+            //boundingCircleTexture = content.Load<Texture2D>("Sprites/Circle");
         }
 
         public void Update(GameTime gameTime)
@@ -85,9 +88,20 @@ namespace SpaceMiner.Sprites
             }
 
             // Draw the asteroid
-            var asteroidSource = new Rectangle(animationFrame * 128, (animationFrame % 8) * 128, 128, 128);
+            var asteroidSource = new Rectangle(animationFrame * size, (animationFrame % 8) * size, size, size);
             // TODO: Change the color as the asteroid is depleted of minerals
-            spriteBatch.Draw(texture, Center - new Vector2(bounds.Radius, bounds.Radius), asteroidSource, Color.White);
+            /*spriteBatch.Draw(
+                boundingCircleTexture, 
+                Center - new Vector2(bounds.Radius, bounds.Radius), 
+                null, 
+                Color.White, 
+                0f, 
+                Vector2.Zero, 
+                (bounds.Radius * 2) / 32, 
+                SpriteEffects.None, 
+                0f
+            );*/
+            spriteBatch.Draw(texture, Center - new Vector2(size / 2, size / 2), asteroidSource, Color.White);
         }
     }
 }
