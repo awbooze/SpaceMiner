@@ -96,7 +96,9 @@ namespace SpaceMiner.Screens
             {
                 sprite.Update(gameTime);
 
-                if (unplacedSprite != null && sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                if (unplacedSprite != null &&
+                    unplacedSprite.CanPlace != false &&
+                    sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
                 {
                     unplacedSprite.CanPlace = false;
                 }
@@ -106,7 +108,9 @@ namespace SpaceMiner.Screens
             {
                 sprite.Update(gameTime);
 
-                if (unplacedSprite != null && sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                if (unplacedSprite != null &&
+                    unplacedSprite.CanPlace != false &&
+                    sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
                 {
                     unplacedSprite.CanPlace = false;
                 }
