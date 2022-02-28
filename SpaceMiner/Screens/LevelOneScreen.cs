@@ -86,11 +86,6 @@ namespace SpaceMiner.Screens
         public override void Update(GameTime gameTime)
         {
             // Update logic here
-            foreach (IMinedSprite sprite in asteroidList)
-            {
-                sprite.Update(gameTime);
-            }
-
             if (unplacedSprite != null)
             {
                 // Updates unplacedSprite.CanPlace to true, among other things
@@ -98,6 +93,16 @@ namespace SpaceMiner.Screens
             }
 
             foreach (IPlayerStationSprite sprite in placedSpriteList)
+            {
+                sprite.Update(gameTime);
+
+                if (unplacedSprite != null && sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                {
+                    unplacedSprite.CanPlace = false;
+                }
+            }
+
+            foreach (IMinedSprite sprite in asteroidList)
             {
                 sprite.Update(gameTime);
 
