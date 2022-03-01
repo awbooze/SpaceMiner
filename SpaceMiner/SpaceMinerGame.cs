@@ -79,7 +79,7 @@ namespace SpaceMiner
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.DarkBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             _screenManager.Draw(gameTime);
             base.Draw(gameTime);
