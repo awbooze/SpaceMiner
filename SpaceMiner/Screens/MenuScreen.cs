@@ -21,6 +21,8 @@ namespace SpaceMiner.Screens
         private SpriteFont exo;
 
         private Vector2 titlePosition;
+        private Vector2 instructionPosition;
+        private string instructions = "Press Enter to Start";
 
         public MenuScreen(SpaceMinerGame game) : base(game)
         {
@@ -39,6 +41,10 @@ namespace SpaceMiner.Screens
             Vector2 titleSize = orbitron.MeasureString(Game.GameTitle);
             titlePosition = new Vector2((Game.BackBufferWidth / 2) - (titleSize.X / 2), 5);
 
+            Vector2 instructionSize = exo.MeasureString(instructions);
+            instructionPosition = new Vector2((Game.BackBufferWidth / 2) - (instructionSize.X / 2),
+                (Game.BackBufferHeight / 2) - (instructionSize.Y / 2));
+
             base.LoadContent();
         }
 
@@ -55,6 +61,7 @@ namespace SpaceMiner.Screens
             _spriteBatch.Begin();
 
             _spriteBatch.DrawString(orbitron, Game.GameTitle, titlePosition, Color.White);
+            _spriteBatch.DrawString(exo, instructions, instructionPosition, Color.White);
             _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
 
             _spriteBatch.End();
