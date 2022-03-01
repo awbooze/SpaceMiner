@@ -22,7 +22,7 @@ namespace SpaceMiner.Screens
 
         private SpriteBatch _spriteBatch;
 
-        private Texture2D one, oRing;
+        private Texture2D oRing;
 
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
@@ -43,12 +43,8 @@ namespace SpaceMiner.Screens
 
             placedSpriteList = new List<IPlayerStationSprite>
             {
-                // Add a pre-placed miner
-                new MinerSprite(new Vector2(475, 200), true, false),
-
-                new MinerSprite(new Vector2(525, 200), true, false),
-
-                new SolarPowerSprite(new Vector2(250, 200), true, false)
+                // Add a pre-placed solar power sprite
+                new SolarPowerSprite(new Vector2(400, 200), true, false)
             };
 
             // Add a non-pre-placed miner (will follow the cursor)
@@ -77,7 +73,6 @@ namespace SpaceMiner.Screens
                 unplacedSprite.LoadContent(Content);
             }
 
-            one = Content.Load<Texture2D>("Sprites/1x1");
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
 
             base.LoadContent();
@@ -96,11 +91,38 @@ namespace SpaceMiner.Screens
             {
                 sprite.Update(gameTime);
 
-                if (unplacedSprite != null &&
-                    unplacedSprite.CanPlace != false &&
-                    sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                if (unplacedSprite != null)
                 {
-                    unplacedSprite.CanPlace = false;
+                    if (unplacedSprite.CanPlace != false &&
+                        sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                    {
+                        unplacedSprite.CanPlace = false;
+                    }
+
+                    // Connect sprites to each other if they can transmit power
+                    if (sprite.CanTransmitPower)
+                    {
+                        // Calculate distance between sprites and whether or not it is larger than the maximum
+                        // connection distance either sprite can make.
+                        float distance = Vector2.Distance(unplacedSprite.Bounds.Center, sprite.Bounds.Center);
+                        int maxConnectionDistance = 
+                            unplacedSprite.MaxConnectionDistance > sprite.MaxConnectionDistance ? 
+                            unplacedSprite.MaxConnectionDistance : 
+                            sprite.MaxConnectionDistance;
+
+                        // Put them on the list if inside the range
+                        if (!unplacedSprite.NearbyStations.Contains(sprite) && distance < maxConnectionDistance)
+                        {
+                            unplacedSprite.NearbyStations.Add(sprite);
+                            sprite.NearbyStations.Add(unplacedSprite);
+                        }
+                        // Take them off of the list if they move outside of range
+                        else if (unplacedSprite.NearbyStations.Contains(sprite) && distance > maxConnectionDistance)
+                        {
+                            unplacedSprite.NearbyStations.Remove(sprite);
+                            sprite.NearbyStations.Remove(unplacedSprite);
+                        }
+                    }
                 }
             }
 
@@ -108,11 +130,30 @@ namespace SpaceMiner.Screens
             {
                 sprite.Update(gameTime);
 
-                if (unplacedSprite != null &&
-                    unplacedSprite.CanPlace != false &&
-                    sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                if (unplacedSprite != null)
                 {
-                    unplacedSprite.CanPlace = false;
+                    if (unplacedSprite.CanPlace != false &&
+                        sprite.Bounds.CollidesWith(unplacedSprite.Bounds))
+                    {
+                        unplacedSprite.CanPlace = false;
+                    }
+
+                    // Connect miner sprites to asteroids
+                    if (unplacedSprite is MinerSprite miner)
+                    {
+                        float distance = Vector2.Distance(miner.Bounds.Center, sprite.Bounds.Center);
+
+                        // Put them on the list if inside the range
+                        if (!miner.NearbyAsteroids.Contains(sprite) && distance < miner.MaxConnectionDistance)
+                        {
+                            miner.NearbyAsteroids.Add(sprite);
+                        }
+                        // Take them off of the list if they move outside of range
+                        else if (miner.NearbyAsteroids.Contains(sprite) && distance > miner.MaxConnectionDistance)
+                        {
+                            miner.NearbyAsteroids.Remove(sprite);
+                        }
+                    }
                 }
             }
 
@@ -143,8 +184,6 @@ namespace SpaceMiner.Screens
             // Draw inside spritebatch calls
             _spriteBatch.Begin();
 
-            // TODO: Abstract these into more classes
-            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(550, 250), one, Color.Red, 1);
             foreach (IMinedSprite sprite in asteroidList)
             {
                 sprite.Draw(gameTime, _spriteBatch);
@@ -153,38 +192,19 @@ namespace SpaceMiner.Screens
             foreach (IPlayerStationSprite sprite in placedSpriteList)
             {
                 // Draw all of the placed sprites
-                sprite.Draw(gameTime, _spriteBatch);
+                sprite.Draw(Game, gameTime, _spriteBatch);
             }
 
             if (unplacedSprite != null)
             {
                 // Draw the unplaced sprite, if it exists
-                unplacedSprite.Draw(gameTime, _spriteBatch);
+                unplacedSprite.Draw(Game, gameTime, _spriteBatch);
             }
 
             // Draw the sprites I haven't abstracted yet
             _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
 
             _spriteBatch.End();
-        }
-
-        /// <summary>
-        /// Draws a line between two points. Originally from a Stack Overflow answer by Cyral 
-        /// (https://stackoverflow.com/a/16407171/10906388) licensed under CC BY-SA 3.0.
-        /// </summary>
-        /// <param name="spriteBatch">The SpriteBatch instance to draw with</param>
-        /// <param name="begin">The beginning point</param>
-        /// <param name="end">The ending point</param>
-        /// <param name="texture">The texture to draw</param>
-        /// <param name="color">The color to tint the line</param>
-        /// <param name="width">The width to draw the line, which defaults to one.</param>
-        public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Texture2D texture, Color color = default, int width = 1)
-        {
-            Rectangle r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
-            Vector2 v = Vector2.Normalize(begin - end);
-            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
-            if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
-            spriteBatch.Draw(texture, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 }

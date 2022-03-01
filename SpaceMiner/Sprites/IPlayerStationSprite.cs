@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceMiner.Collisions;
+using System.Collections.Generic;
 
 namespace SpaceMiner.Sprites
 {
@@ -29,17 +30,25 @@ namespace SpaceMiner.Sprites
 
         public bool CanPlace { get; set; }
 
+        public int MaxConnectionDistance { get; }
+
         /// <summary>
         /// Whether the station has a power connection.
         /// </summary>
         public bool Powered { get; set; }
 
+        public bool CanTransmitPower { get; }
+
         public bool Selected { get; set; }
+
+        public List<IPlayerStationSprite> NearbyStations { get; }
 
         public void LoadContent(ContentManager content);
 
         public void Update(GameTime gameTime);
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+        public void Draw(SpaceMinerGame game, GameTime gameTime, SpriteBatch spriteBatch);
+
+        public bool Equals(IPlayerStationSprite otherSprite);
     }
 }

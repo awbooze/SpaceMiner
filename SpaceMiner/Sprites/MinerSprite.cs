@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpaceMiner.Collisions;
 using System;
+using System.Collections.Generic;
 
 namespace SpaceMiner.Sprites
 {
@@ -51,7 +52,15 @@ namespace SpaceMiner.Sprites
 
         public bool Powered { get => powered; set => throw new NotImplementedException(); }
 
+        public bool CanTransmitPower => false;
+
+        public int MaxConnectionDistance => 100;
+
         public bool Selected { get; set; }
+
+        public List<IPlayerStationSprite> NearbyStations { get; private set; } = new List<IPlayerStationSprite>();
+
+        public List<IMinedSprite> NearbyAsteroids { get; private set; } = new List<IMinedSprite>();
 
         private MouseState currentMouseState;
 
@@ -83,10 +92,44 @@ namespace SpaceMiner.Sprites
             }
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public void Draw(SpaceMinerGame game, GameTime gameTime, SpriteBatch spriteBatch)
         {
+            foreach (IPlayerStationSprite sprite in NearbyStations)
+            {
+                game.DrawLine(spriteBatch, bounds.Center, sprite.Bounds.Center, Color.Blue);
+            }
+
+            foreach (IMinedSprite sprite in NearbyAsteroids)
+            {
+                game.DrawLine(spriteBatch, bounds.Center, sprite.Bounds.Center, Color.Red);
+            }
+
             Color drawColor = (Placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
             spriteBatch.Draw(texture, center - new Vector2(bounds.Radius, bounds.Radius), drawColor);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is IPlayerStationSprite otherSprite)
+            {
+                return Equals(otherSprite);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Equals(IPlayerStationSprite otherSprite)
+        {
+            if (otherSprite is MinerSprite otherMiner)
+            {
+                return otherMiner.center == this.center;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

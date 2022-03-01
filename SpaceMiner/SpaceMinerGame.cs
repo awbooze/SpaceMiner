@@ -19,10 +19,13 @@ namespace SpaceMiner
     {
         private GraphicsDeviceManager _graphics;
         private readonly ScreenManager _screenManager;
+        private Texture2D lineTexture;
 
         public string GameTitle { get; private set; } = "Space Miner";
         public int BackBufferWidth => _graphics.PreferredBackBufferWidth;
         public int BackBufferHeight => _graphics.PreferredBackBufferHeight;
+
+        public int WidthToConnect { get; } = 100;
 
         public KeyboardState PriorKeyboardState { get; private set; }
         public KeyboardState CurrentKeyboardState { get; private set; }
@@ -56,6 +59,9 @@ namespace SpaceMiner
 
         protected override void LoadContent()
         {
+            // Load the texture for generic lines
+            lineTexture = Content.Load<Texture2D>("Sprites/1x1");
+
             // Load the first screen
             _screenManager.LoadScreen(new SplashScreen(this));
         }
@@ -83,6 +89,28 @@ namespace SpaceMiner
 
             _screenManager.Draw(gameTime);
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// Draws a line between two points. Originally from a Stack Overflow answer by Cyral 
+        /// (https://stackoverflow.com/a/16407171/10906388) licensed under CC BY-SA 3.0.
+        /// </summary>
+        /// <param name="spriteBatch">The SpriteBatch instance to draw with</param>
+        /// <param name="begin">The beginning point</param>
+        /// <param name="end">The ending point</param>
+        /// <param name="color">The color to tint the line</param>
+        /// <param name="width">The width to draw the line, which defaults to one.</param>
+        public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Color color = default, int width = 1)
+        {
+            Rectangle r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
+            Vector2 v = Vector2.Normalize(begin - end);
+            
+            float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
+            if (begin.Y > end.Y)
+            {
+                angle = MathHelper.TwoPi - angle;
+            }
+            spriteBatch.Draw(lineTexture, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 }
