@@ -7,6 +7,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Screens;
 using SpaceMiner.Screens;
 using SpaceMiner.Sprites;
@@ -59,6 +60,12 @@ namespace SpaceMiner
         {
             // Load the texture for generic lines
             lineTexture = Content.Load<Texture2D>("Sprites/1x1");
+
+            // Load sounds and music
+            Song flow = Content.Load<Song>("Music/Flow");
+            MediaPlayer.Volume = 0.8f;
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(flow);
 
             // Load the first screen
             _screenManager.LoadScreen(new SplashScreen(this));

@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
 using SpaceMiner.Sprites;
@@ -74,6 +75,9 @@ namespace SpaceMiner.Screens
             }
 
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
+
+            // Lower the volume a bit so that people can hear sound effects
+            MediaPlayer.Volume = 0.5f;
 
             base.LoadContent();
         }

@@ -27,6 +27,12 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Orbitron.spritefont
 
+#begin Music/Flow.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/Flow.mp3
+
 #begin Sprites/1x1.png
 /importer:TextureImporter
 /processor:TextureProcessor
