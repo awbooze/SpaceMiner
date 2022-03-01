@@ -21,7 +21,7 @@ namespace SpaceMiner.Sprites
         //private Texture2D boundingCircleTexture;
         private int size = 128;
         private double animationTimer;
-        private short animationFrame = 1;
+        private short animationFrame = 0;
 
         public Vector2 Center { get; private set; }
 
@@ -75,20 +75,20 @@ namespace SpaceMiner.Sprites
             animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
 
             // Update animation frame
-            if (animationTimer > 0.2)
+            if (animationTimer > 0.5)
             {
                 animationFrame++;
 
-                if (animationFrame > 3)
+                if (animationFrame > 63)
                 {
-                    animationFrame = 1;
+                    animationFrame = 0;
                 }
 
-                animationTimer -= 0.2;
+                animationTimer -= 0.5;
             }
 
             // Draw the asteroid
-            var asteroidSource = new Rectangle(animationFrame * size, (animationFrame % 8) * size, size, size);
+            var asteroidSource = new Rectangle((animationFrame % 8) * size, (animationFrame / 8) * size, size, size);
             // TODO: Change the color as the asteroid is depleted of minerals
             /*spriteBatch.Draw(
                 boundingCircleTexture, 
