@@ -25,8 +25,6 @@ namespace SpaceMiner
         public int BackBufferWidth => _graphics.PreferredBackBufferWidth;
         public int BackBufferHeight => _graphics.PreferredBackBufferHeight;
 
-        public int WidthToConnect { get; } = 100;
-
         public KeyboardState PriorKeyboardState { get; private set; }
         public KeyboardState CurrentKeyboardState { get; private set; }
 
