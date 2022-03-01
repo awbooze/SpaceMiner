@@ -27,6 +27,18 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Orbitron.spritefont
 
+#begin Sprites/1x1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Sprites/1x1.png
+
 #begin Sprites/Asteroid.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -38,18 +50,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sprites/Asteroid.png
-
-#begin Sprites/Circle.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Sprites/Circle.png
 
 #begin Sprites/Circle.png
 /importer:TextureImporter

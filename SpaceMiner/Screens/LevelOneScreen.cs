@@ -22,7 +22,7 @@ namespace SpaceMiner.Screens
 
         private SpriteBatch _spriteBatch;
 
-        private Texture2D miningLaser, oRing;
+        private Texture2D one, oRing;
 
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
@@ -77,7 +77,7 @@ namespace SpaceMiner.Screens
                 unplacedSprite.LoadContent(Content);
             }
 
-            miningLaser = Content.Load<Texture2D>("Sprites/Mining Laser");
+            one = Content.Load<Texture2D>("Sprites/1x1");
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
 
             base.LoadContent();
@@ -144,7 +144,7 @@ namespace SpaceMiner.Screens
             _spriteBatch.Begin();
 
             // TODO: Abstract these into more classes
-            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(550, 250), miningLaser);
+            DrawLine(_spriteBatch, new Vector2(475, 200), new Vector2(550, 250), one, Color.Red, 1);
             foreach (IMinedSprite sprite in asteroidList)
             {
                 sprite.Draw(gameTime, _spriteBatch);
@@ -176,14 +176,15 @@ namespace SpaceMiner.Screens
         /// <param name="begin">The beginning point</param>
         /// <param name="end">The ending point</param>
         /// <param name="texture">The texture to draw</param>
+        /// <param name="color">The color to tint the line</param>
         /// <param name="width">The width to draw the line, which defaults to one.</param>
-        public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Texture2D texture, int width = 1)
+        public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Texture2D texture, Color color = default, int width = 1)
         {
             Rectangle r = new Rectangle((int)begin.X, (int)begin.Y, (int)(end - begin).Length() + width, width);
             Vector2 v = Vector2.Normalize(begin - end);
             float angle = (float)Math.Acos(Vector2.Dot(v, -Vector2.UnitX));
             if (begin.Y > end.Y) angle = MathHelper.TwoPi - angle;
-            spriteBatch.Draw(texture, r, null, Color.White, angle, Vector2.Zero, SpriteEffects.None, 0);
+            spriteBatch.Draw(texture, r, null, color, angle, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 }
