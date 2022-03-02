@@ -13,6 +13,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Effects/blg_a_robo_08.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Effects/blg_a_robo_08.wav
+
 #begin Fonts/Exo.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

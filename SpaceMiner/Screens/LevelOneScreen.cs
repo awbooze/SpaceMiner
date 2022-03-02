@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
@@ -24,6 +25,7 @@ namespace SpaceMiner.Screens
         private SpriteBatch _spriteBatch;
 
         private Texture2D oRing;
+        private SoundEffect placeSprite;
 
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
@@ -75,6 +77,7 @@ namespace SpaceMiner.Screens
             }
 
             oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
+            placeSprite = Content.Load<SoundEffect>("Effects/blg_a_robo_08");
 
             // Lower the volume a bit so that people can hear sound effects
             MediaPlayer.Volume = 0.5f;
@@ -168,6 +171,7 @@ namespace SpaceMiner.Screens
                 unplacedSprite.Placed = true;
                 unplacedSprite.Selected = false;
                 placedSpriteList.Add(unplacedSprite);
+                placeSprite.Play(1.0f, 0, 0);
 
                 if (Game.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
                 {

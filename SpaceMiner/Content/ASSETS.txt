@@ -6,4 +6,6 @@ Sprites/Asteroid - Copyright 2018 IgalBlech on OpenGameArt.org (https://opengame
 
 Music/Flow - Copyright 2022 Anna Centauri (https://freemusicarchive.org/music/anna-centauri/anna-centauri-flow/anna-centauri-flow) and licensed under the Creative Commons Attribution-ShareAlike 4.0 International license.
 
+Effects/blg_a_robo_08 - From the "50 Free SciFi SoundFX - 192kHz, 64-bit 24,576kbps WAV" collection (https://opengameart.org/content/50-free-scifi-soundfx-192khz-64-bit-24576kbps-wav) - Copyright 2017 blacklodgegames and released into the public domain.
+
 All other content in the Content folder is Copyright 2022 Andrew Booze and licensed under the Creative Commons Attribution-ShareAlike 4.0 International license (https://creativecommons.org/licenses/by-sa/4.0/).
