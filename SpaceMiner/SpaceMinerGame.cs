@@ -16,21 +16,62 @@ using System.Collections.Generic;
 
 namespace SpaceMiner
 {
+    /// <summary>
+    /// The Game class for this Monogame game.
+    /// </summary>
     public class SpaceMinerGame : Game
     {
         private GraphicsDeviceManager _graphics;
         private readonly ScreenManager _screenManager;
         private Texture2D lineTexture;
 
+        /// <summary>
+        /// The title of the game. Displayed in-game as the game title and at
+        /// the top of the window.
+        /// </summary>
         public string GameTitle { get; private set; } = "Space Miner";
+
+        /// <summary>
+        /// The graphics device's preferred width.
+        /// </summary>
         public int BackBufferWidth => _graphics.PreferredBackBufferWidth;
+
+        /// <summary>
+        /// The graphics device's preferred height.
+        /// </summary>
         public int BackBufferHeight => _graphics.PreferredBackBufferHeight;
 
+        #region Input State
+        /// <summary>
+        /// The previous tick's GamePadState.
+        /// </summary>
+        public GamePadState PriorGamePadState { get; private set; }
+
+        /// <summary>
+        /// The current tick's GamePadState.
+        /// </summary>
+        public GamePadState CurrentGamePadState { get; private set; }
+
+        /// <summary>
+        /// The previous tick's KeyboardState.
+        /// </summary>
         public KeyboardState PriorKeyboardState { get; private set; }
+
+        /// <summary>
+        /// The current tick's KeyboardState.
+        /// </summary>
         public KeyboardState CurrentKeyboardState { get; private set; }
 
+        /// <summary>
+        /// The previous tick's MouseState.
+        /// </summary>
         public MouseState PriorMouseState { get; private set; }
+
+        /// <summary>
+        /// The current tick's MouseState.
+        /// </summary>
         public MouseState CurrentMouseState { get; private set; }
+        #endregion
 
         public SpaceMinerGame()
         {
@@ -42,6 +83,10 @@ namespace SpaceMiner
             Components.Add(_screenManager);
         }
 
+        /// <summary>
+        /// Initialize the game, including setting up the graphical size and
+        /// the ScreenManager.
+        /// </summary>
         protected override void Initialize()
         {
             // Add initialization logic
@@ -56,6 +101,9 @@ namespace SpaceMiner
             base.Initialize();
         }
 
+        /// <summary>
+        /// Load some content for this game, including the first screen.
+        /// </summary>
         protected override void LoadContent()
         {
             // Load the texture for generic lines
@@ -71,23 +119,37 @@ namespace SpaceMiner
             _screenManager.LoadScreen(new SplashScreen(this));
         }
 
+        /// <summary>
+        /// Update the current game state, followed by a call to the
+        /// <see cref="Draw(GameTime)">Draw</see> method directly after these
+        /// operations.
+        /// </summary>
+        /// <param name="gameTime">The time state of this game.</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-
             PriorKeyboardState = CurrentKeyboardState;
             CurrentKeyboardState = Keyboard.GetState();
 
             PriorMouseState = CurrentMouseState;
             CurrentMouseState = Mouse.GetState();
 
+            PriorGamePadState = CurrentGamePadState;
+            CurrentGamePadState = GamePad.GetState(PlayerIndex.One);
+
+            if (CurrentGamePadState.Buttons.Back == ButtonState.Pressed || CurrentKeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+            }
+
             _screenManager.Update(gameTime);
             base.Update(gameTime);
         }
 
+        /// <summary>
+        /// Draw the current game state right after the
+        /// <see cref="Update(GameTime)">Update</see> method.
+        /// </summary>
+        /// <param name="gameTime">The time state of this game.</param>
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
@@ -97,13 +159,14 @@ namespace SpaceMiner
         }
 
         /// <summary>
-        /// Draws a line between two points. Originally from a Stack Overflow answer by Cyral 
-        /// (https://stackoverflow.com/a/16407171/10906388) licensed under CC BY-SA 3.0.
+        /// Draws a line between two points. Originally from a Stack Overflow
+        /// answer by Cyral (https://stackoverflow.com/a/16407171/10906388)
+        /// licensed under CC BY-SA 3.0.
         /// </summary>
         /// <param name="spriteBatch">The SpriteBatch instance to draw with</param>
         /// <param name="begin">The beginning point</param>
         /// <param name="end">The ending point</param>
-        /// <param name="color">The color to tint the line</param>
+        /// <param name="color">The color to tint the line, which defaults to the default (White).</param>
         /// <param name="width">The width to draw the line, which defaults to one.</param>
         public void DrawLine(SpriteBatch spriteBatch, Vector2 begin, Vector2 end, Color color = default, int width = 1)
         {
