@@ -60,6 +60,8 @@ namespace SpaceMiner.Screens
         {
             _spriteBatch.Begin();
 
+            Game.Tilemap.Draw(gameTime, _spriteBatch);
+
             _spriteBatch.DrawString(orbitron, Game.GameTitle, titlePosition, Color.White);
             _spriteBatch.DrawString(exo, instructions, instructionPosition, Color.White);
             _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);

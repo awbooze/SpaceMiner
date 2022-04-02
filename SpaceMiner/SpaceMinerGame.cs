@@ -24,6 +24,8 @@ namespace SpaceMiner
         private GraphicsDeviceManager _graphics;
         private readonly ScreenManager _screenManager;
         private Texture2D lineTexture;
+        
+        public Tilemap Tilemap { get; private set; }
 
         /// <summary>
         /// The title of the game. Displayed in-game as the game title and at
@@ -97,6 +99,8 @@ namespace SpaceMiner
 
             Window.Title = GameTitle;
 
+            Tilemap = new Tilemap("Sprites/star_animation_strip", 32, 32, BackBufferWidth, BackBufferHeight);
+
             _screenManager.Initialize();
             base.Initialize();
         }
@@ -108,6 +112,8 @@ namespace SpaceMiner
         {
             // Load the texture for generic lines
             lineTexture = Content.Load<Texture2D>("Sprites/1x1");
+
+            Tilemap.LoadContent(Content);
 
             // Load sounds and music
             Song flow = Content.Load<Song>("Music/Flow");
@@ -153,7 +159,7 @@ namespace SpaceMiner
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-
+            
             _screenManager.Draw(gameTime);
             base.Draw(gameTime);
         }

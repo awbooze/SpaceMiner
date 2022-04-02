@@ -63,6 +63,8 @@ namespace SpaceMiner.Screens
         {
             _spriteBatch.Begin();
 
+            Game.Tilemap.Draw(gameTime, _spriteBatch);
+
             _spriteBatch.DrawString(orbitron, Game.GameTitle, titlePosition, Color.White);
             _spriteBatch.DrawString(exo, loading, loadingPosition, Color.White);
 

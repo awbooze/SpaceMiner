@@ -192,6 +192,8 @@ namespace SpaceMiner.Screens
             // Draw inside spritebatch calls
             _spriteBatch.Begin();
 
+            Game.Tilemap.Draw(gameTime, _spriteBatch);
+
             foreach (IMinedSprite sprite in asteroidList)
             {
                 sprite.Draw(gameTime, _spriteBatch);
