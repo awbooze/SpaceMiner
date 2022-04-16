@@ -164,7 +164,7 @@ namespace SpaceMiner.Screens
                 }
             }
 
-            if (Game.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null &&
+            if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null &&
                 unplacedSprite.CanPlace)
             {
                 // Place the player station sprite
@@ -173,10 +173,10 @@ namespace SpaceMiner.Screens
                 placedSpriteList.Add(unplacedSprite);
                 placeSprite.Play(1.0f, 0, 0);
 
-                if (Game.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
+                if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
                 {
                     // Place multiple sprites, so create another one
-                    unplacedSprite = new MinerSprite(new Vector2(Game.CurrentMouseState.X, Game.CurrentMouseState.Y), false, true);
+                    unplacedSprite = new MinerSprite(new Vector2(Game.Input.CurrentMouseState.X, Game.Input.CurrentMouseState.Y), false, true);
                     unplacedSprite.LoadContent(Content);
                 }
                 else

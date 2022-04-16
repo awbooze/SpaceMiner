@@ -50,7 +50,7 @@ namespace SpaceMiner.Screens
 
         public override void Update(GameTime gameTime)
         {
-            if (Game.CurrentKeyboardState.IsKeyDown(Keys.Enter))
+            if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.Enter))
             {
                 ScreenManager.LoadScreen(new LevelOneScreen(Game));
             }

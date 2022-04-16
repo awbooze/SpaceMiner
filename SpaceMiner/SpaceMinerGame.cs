@@ -9,10 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Screens;
+using SpaceMiner.Input;
 using SpaceMiner.Screens;
-using SpaceMiner.Sprites;
 using System;
-using System.Collections.Generic;
 
 namespace SpaceMiner
 {
@@ -25,6 +24,9 @@ namespace SpaceMiner
         private readonly ScreenManager _screenManager;
         private Texture2D lineTexture;
         
+        /// <summary>
+        /// The tilemap used as the background of every screen in the game.
+        /// </summary>
         public Tilemap Tilemap { get; private set; }
 
         /// <summary>
@@ -43,42 +45,17 @@ namespace SpaceMiner
         /// </summary>
         public int BackBufferHeight => _graphics.PreferredBackBufferHeight;
 
-        #region Input State
         /// <summary>
-        /// The previous tick's GamePadState.
+        /// The game's current inputs.
         /// </summary>
-        public GamePadState PriorGamePadState { get; private set; }
-
-        /// <summary>
-        /// The current tick's GamePadState.
-        /// </summary>
-        public GamePadState CurrentGamePadState { get; private set; }
-
-        /// <summary>
-        /// The previous tick's KeyboardState.
-        /// </summary>
-        public KeyboardState PriorKeyboardState { get; private set; }
-
-        /// <summary>
-        /// The current tick's KeyboardState.
-        /// </summary>
-        public KeyboardState CurrentKeyboardState { get; private set; }
-
-        /// <summary>
-        /// The previous tick's MouseState.
-        /// </summary>
-        public MouseState PriorMouseState { get; private set; }
-
-        /// <summary>
-        /// The current tick's MouseState.
-        /// </summary>
-        public MouseState CurrentMouseState { get; private set; }
-        #endregion
+        public InputState Input { get; private set; }
 
         public SpaceMinerGame()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            Input = new InputState();
             IsMouseVisible = true;
 
             _screenManager = new ScreenManager();
@@ -133,16 +110,16 @@ namespace SpaceMiner
         /// <param name="gameTime">The time state of this game.</param>
         protected override void Update(GameTime gameTime)
         {
-            PriorKeyboardState = CurrentKeyboardState;
-            CurrentKeyboardState = Keyboard.GetState();
+            Input.Update();
 
-            PriorMouseState = CurrentMouseState;
-            CurrentMouseState = Mouse.GetState();
+            InputAction ExitAction = new InputAction(
+                new[] { Buttons.Back },
+                new[] { Keys.Back, Keys.Escape },
+                null,
+                false
+            );
 
-            PriorGamePadState = CurrentGamePadState;
-            CurrentGamePadState = GamePad.GetState(PlayerIndex.One);
-
-            if (CurrentGamePadState.Buttons.Back == ButtonState.Pressed || CurrentKeyboardState.IsKeyDown(Keys.Escape))
+            if (ExitAction.Occurred(Input))
             {
                 Exit();
             }
