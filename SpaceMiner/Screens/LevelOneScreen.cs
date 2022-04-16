@@ -20,7 +20,7 @@ namespace SpaceMiner.Screens
 {
     public class LevelOneScreen : GameScreen
     {
-        private new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
+        public new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
 
         private SpriteBatch _spriteBatch;
 
@@ -164,8 +164,8 @@ namespace SpaceMiner.Screens
                 }
             }
 
-            if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null &&
-                unplacedSprite.CanPlace)
+            if (Game.Input.CurrentMouseState.WasButtonJustDown(MonoGame.Extended.Input.MouseButton.Left)
+                && unplacedSprite != null && unplacedSprite.CanPlace)
             {
                 // Place the player station sprite
                 unplacedSprite.Placed = true;

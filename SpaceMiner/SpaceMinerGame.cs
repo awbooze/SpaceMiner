@@ -20,20 +20,21 @@ namespace SpaceMiner
     /// </summary>
     public class SpaceMinerGame : Game
     {
-        private GraphicsDeviceManager _graphics;
         private readonly ScreenManager _screenManager;
-        private Texture2D lineTexture;
-        
+
         /// <summary>
-        /// The tilemap used as the background of every screen in the game.
+        /// The game's current inputs.
         /// </summary>
-        public Tilemap Tilemap { get; private set; }
+        public InputState Input { get; private set; }
 
         /// <summary>
         /// The title of the game. Displayed in-game as the game title and at
         /// the top of the window.
         /// </summary>
         public string GameTitle { get; private set; } = "Space Miner";
+
+        #region General Graphical Info
+        private GraphicsDeviceManager _graphics;
 
         /// <summary>
         /// The graphics device's preferred width.
@@ -44,11 +45,31 @@ namespace SpaceMiner
         /// The graphics device's preferred height.
         /// </summary>
         public int BackBufferHeight => _graphics.PreferredBackBufferHeight;
+        #endregion
+
+        #region Additional Graphics and Textures
+        private Texture2D lineTexture;
 
         /// <summary>
-        /// The game's current inputs.
+        /// The tilemap used as the background of every screen in the game.
         /// </summary>
-        public InputState Input { get; private set; }
+        public Tilemap Tilemap { get; private set; }
+
+        /// <summary>
+        /// The large title font for the game - Orbitron 48pt
+        /// </summary>
+        public SpriteFont TitleFont { get; private set; }
+        
+        /// <summary>
+        /// The smaller general-use font for the game - Exo 18pt
+        /// </summary>
+        public SpriteFont GeneralFont { get; private set; }
+
+        /// <summary>
+        /// The smallest general-use font for the game - Exo 11pt
+        /// </summary>
+        public SpriteFont SmallFont { get; private set; }
+        #endregion
 
         public SpaceMinerGame()
         {
@@ -98,6 +119,11 @@ namespace SpaceMiner
             MediaPlayer.IsRepeating = true;
             MediaPlayer.Play(flow);
 
+            // Load Global Fonts
+            TitleFont = Content.Load<SpriteFont>("Fonts/Orbitron");
+            GeneralFont = Content.Load<SpriteFont>("Fonts/Exo");
+            SmallFont = Content.Load<SpriteFont>("Fonts/ExoSmall");
+
             // Load the first screen
             _screenManager.LoadScreen(new SplashScreen(this));
         }
@@ -111,7 +137,9 @@ namespace SpaceMiner
         protected override void Update(GameTime gameTime)
         {
             Input.Update();
+            _screenManager.Update(gameTime);
 
+            // Failsafe exit
             InputAction ExitAction = new InputAction(
                 new[] { Buttons.Back },
                 new[] { Keys.Back, Keys.Escape },
@@ -124,7 +152,6 @@ namespace SpaceMiner
                 Exit();
             }
 
-            _screenManager.Update(gameTime);
             base.Update(gameTime);
         }
 
