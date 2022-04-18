@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
+using SpaceMiner.Sprites;
 
 namespace SpaceMiner.Screens
 {
@@ -23,6 +24,7 @@ namespace SpaceMiner.Screens
         private Vector2 titlePosition;
         private Vector2 loadingPosition;
         private string loading = "Loading ...";
+        private Cube cube;
 
         private readonly TimeSpan splashTime = new TimeSpan(0, 0, 2);
 
@@ -47,11 +49,15 @@ namespace SpaceMiner.Screens
             loadingPosition = new Vector2((Game.BackBufferWidth / 2) - (loadingSize.X / 2),
                 (Game.BackBufferHeight) - (loadingSize.Y));
 
+            cube = new Cube(Game);
+
             base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
+            cube.Update(gameTime);
+
             // If two seconds have passed, move to the MenuScreen
             if (gameTime.TotalGameTime > splashTime)
             {
@@ -67,6 +73,8 @@ namespace SpaceMiner.Screens
 
             _spriteBatch.DrawString(orbitron, Game.GameTitle, titlePosition, Color.White);
             _spriteBatch.DrawString(exo, loading, loadingPosition, Color.White);
+
+            cube.Draw();
 
             _spriteBatch.End();
         }
