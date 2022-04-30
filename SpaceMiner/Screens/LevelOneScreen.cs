@@ -38,6 +38,8 @@ namespace SpaceMiner.Screens
 
         private Point viewportPosition;
 
+        private Matrix transform;
+
         public LevelOneScreen(SpaceMinerGame game) : base(game)
         {
             // Place the current viewport in the center of the screen
@@ -194,28 +196,35 @@ namespace SpaceMiner.Screens
             }
 
             // Mouse Actions
-            if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null &&
-                unplacedSprite.CanPlace)
+            if (unplacedSprite != null)
             {
-                // Place the player station sprite
-                unplacedSprite.Placed = true;
-                unplacedSprite.Selected = false;
-                placedSpriteList.Add(unplacedSprite);
-                placeSprite.Play(1.0f, 0, 0);
+                Point mousePosition = Game.Input.CurrentMouseState.Position;
+                Vector2 scaledMouse = Vector2.Transform(new Vector2(mousePosition.X, mousePosition.Y), Matrix.Invert(transform));
+                unplacedSprite.Center = scaledMouse;
 
-                if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
+                if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed &&
+                    unplacedSprite.CanPlace)
                 {
-                    // Place multiple sprites, so create another one
-                    unplacedSprite = new MinerSprite(new Vector2(Game.Input.CurrentMouseState.X, Game.Input.CurrentMouseState.Y), false, true);
-                    unplacedSprite.LoadContent(Content);
-                }
-                else
-                {
-                    // Only place one sprite
-                    unplacedSprite = null;
+                    // Place the player station sprite
+                    unplacedSprite.Placed = true;
+                    unplacedSprite.Selected = false;
+                    placedSpriteList.Add(unplacedSprite);
+                    placeSprite.Play(1.0f, 0, 0);
+
+                    if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
+                    {
+                        // Place multiple sprites, so create another one
+                        unplacedSprite = new MinerSprite(scaledMouse, false, true);
+                        unplacedSprite.LoadContent(Content);
+                    }
+                    else
+                    {
+                        // Only place one sprite
+                        unplacedSprite = null;
+                    }
                 }
             }
-            else if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite == null)
+            else if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed)
             {
                 // Move the background
                 viewportPosition += Game.Input.CurrentMouseState.DeltaPosition;
@@ -224,12 +233,13 @@ namespace SpaceMiner.Screens
 
         public override void Draw(GameTime gameTime)
         {
+            // Update matrix transformations
             Matrix zoomTranslation = Matrix.CreateTranslation(-viewportPosition.X - Game.BackBufferWidth / 2, -viewportPosition.Y - Game.BackBufferHeight / 2, 0);
             Matrix zoomScale = Matrix.CreateScale(zoom);
             Matrix viewportTranslation = Matrix.CreateTranslation(-viewportPosition.X, -viewportPosition.Y, 0);
-            Matrix transform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation) * viewportTranslation;
+            transform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation) * viewportTranslation;
 
-            // Draw Tilemap without zoom
+            // Draw Tilemap without transformations
             _spriteBatch.Begin();
             Game.Tilemap.Draw(gameTime, _spriteBatch);
             _spriteBatch.End();

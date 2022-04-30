@@ -19,6 +19,11 @@ namespace SpaceMiner.Sprites
     public interface IPlayerStationSprite
     {
         /// <summary>
+        /// The geometric center of this object
+        /// </summary>
+        public Vector2 Center { get; set; }
+
+        /// <summary>
         /// The station's collision boundry.
         /// </summary>
         public IBounding Bounds { get; set; }
