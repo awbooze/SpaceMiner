@@ -25,6 +25,7 @@ namespace SpaceMiner.Screens
         private SpriteBatch _spriteBatch;
 
         private Texture2D oRing;
+        private float oRingSpin;
         private SoundEffect placeSprite;
 
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
@@ -97,6 +98,10 @@ namespace SpaceMiner.Screens
 
         public override void Update(GameTime gameTime)
         {
+            // Spin the O Ring ship
+            oRingSpin += 0.05f;
+
+            // Respond to Zoom inputs
             if (Game.Input.CurrentMouseState.DeltaScrollWheelValue != 0)
             {
                 zoom -= ((float)Game.Input.CurrentMouseState.DeltaScrollWheelValue) / 2400;
@@ -249,8 +254,16 @@ namespace SpaceMiner.Screens
                 unplacedSprite.Draw(Game, gameTime, _spriteBatch);
             }
 
+            _spriteBatch.End();
+
+            _spriteBatch.Begin(transformMatrix: transform, blendState: BlendState.AlphaBlend);
+
             // Draw the sprites I haven't abstracted yet
-            _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
+            _spriteBatch.Draw(oRing, new Vector2(1300, 1700), new Rectangle(0, 0, 64, 64),
+                Color.White, oRingSpin, new Vector2(32, 32), 1, SpriteEffects.None, 0);
+
+            _spriteBatch.Draw(oRing, new Vector2(1310, 1710), new Rectangle(0, 0, 64, 64),
+                Color.White, oRingSpin, new Vector2(32, 32), 1, SpriteEffects.None, 0);
 
             _spriteBatch.End();
         }
