@@ -224,7 +224,8 @@ namespace SpaceMiner.Screens
                     }
                 }
             }
-            else if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed)
+            
+            if (Game.Input.CurrentMouseState.RightButton == ButtonState.Pressed)
             {
                 // Move the background
                 viewportPosition += Game.Input.CurrentMouseState.DeltaPosition;
