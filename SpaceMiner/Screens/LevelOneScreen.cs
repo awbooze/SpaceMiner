@@ -31,9 +31,19 @@ namespace SpaceMiner.Screens
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
 
+        private int levelHeight = 3200;
+        private int levelWidth = 3200;
+        private float zoom = 1.5f;
+
+        private Point viewportPosition;
+
         public LevelOneScreen(SpaceMinerGame game) : base(game)
         {
-            // Nothing here
+            // Place the current viewport in the center of the screen
+            viewportPosition = new Point(
+                levelWidth / 2 - Game.BackBufferWidth / 2,
+                levelHeight / 2 - Game.BackBufferHeight / 2
+            );
         }
         
         public override void Initialize()
@@ -41,13 +51,13 @@ namespace SpaceMiner.Screens
             // Initialize Sprites
             asteroidList = new List<IMinedSprite>
             {
-                new AsteroidSprite(new Vector2(550, 250), 800)
+                new AsteroidSprite(new Vector2(1600, 1600), 800)
             };
 
             placedSpriteList = new List<IPlayerStationSprite>
             {
                 // Add a pre-placed solar power sprite
-                new SolarPowerSprite(new Vector2(400, 200), true, false)
+                new SolarPowerSprite(new Vector2(1400, 1600), true, false)
             };
 
             // Add a non-pre-placed miner (will follow the cursor)
@@ -87,6 +97,20 @@ namespace SpaceMiner.Screens
 
         public override void Update(GameTime gameTime)
         {
+            if (Game.Input.CurrentMouseState.DeltaScrollWheelValue != 0)
+            {
+                zoom -= ((float)Game.Input.CurrentMouseState.DeltaScrollWheelValue) / 2400;
+
+                if (zoom < 0.1f)
+                {
+                    zoom = 0.1f;
+                }
+                else if (zoom > 5f)
+                {
+                    zoom = 5f;
+                }
+            }
+
             // Update logic here
             if (unplacedSprite != null)
             {
@@ -164,6 +188,7 @@ namespace SpaceMiner.Screens
                 }
             }
 
+            // Mouse Actions
             if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite != null &&
                 unplacedSprite.CanPlace)
             {
@@ -185,14 +210,27 @@ namespace SpaceMiner.Screens
                     unplacedSprite = null;
                 }
             }
+            else if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed && unplacedSprite == null)
+            {
+                // Move the background
+                viewportPosition += Game.Input.CurrentMouseState.DeltaPosition;
+            }
         }
 
         public override void Draw(GameTime gameTime)
         {
-            // Draw inside spritebatch calls
-            _spriteBatch.Begin();
+            Matrix zoomTranslation = Matrix.CreateTranslation(-viewportPosition.X - Game.BackBufferWidth / 2, -viewportPosition.Y - Game.BackBufferHeight / 2, 0);
+            Matrix zoomScale = Matrix.CreateScale(zoom);
+            Matrix viewportTranslation = Matrix.CreateTranslation(-viewportPosition.X, -viewportPosition.Y, 0);
+            Matrix transform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation) * viewportTranslation;
 
+            // Draw Tilemap without zoom
+            _spriteBatch.Begin();
             Game.Tilemap.Draw(gameTime, _spriteBatch);
+            _spriteBatch.End();
+
+            // Draw inside spritebatch calls
+            _spriteBatch.Begin(transformMatrix: transform);
 
             foreach (IMinedSprite sprite in asteroidList)
             {
