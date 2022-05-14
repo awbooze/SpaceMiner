@@ -28,8 +28,10 @@ namespace SpaceMiner.Screens
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
+
         private int _totalMinerals = 0;
         private int _mineralsMined = 0;
+        private int _mineralsAvailable = 0;
 
         private int levelHeight = 3200;
         private int levelWidth = 3200;
@@ -50,6 +52,9 @@ namespace SpaceMiner.Screens
         
         public override void Initialize()
         {
+            // Reset elapsed time to zero for timekeeping
+            Game.ResetElapsedTime();
+
             // Initialize Sprites
             asteroidList = new List<IMinedSprite>
             {
@@ -251,12 +256,12 @@ namespace SpaceMiner.Screens
             Matrix viewportTranslation = Matrix.CreateTranslation(-viewportPosition.X, -viewportPosition.Y, 0);
             transform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation) * viewportTranslation;
 
-            // Draw Tilemap without transformations
+            // Draw Tilemap without transformations underneath everything
             _spriteBatch.Begin();
             Game.Tilemap.Draw(gameTime, _spriteBatch);
             _spriteBatch.End();
 
-            // Draw inside spritebatch calls
+            // Draw transformmed objects
             _spriteBatch.Begin(transformMatrix: transform);
 
             foreach (IMinedSprite sprite in asteroidList)
@@ -275,6 +280,19 @@ namespace SpaceMiner.Screens
                 // Draw the unplaced sprite, if it exists
                 unplacedSprite.Draw(Game, gameTime, _spriteBatch);
             }
+
+            _spriteBatch.End();
+
+            // Draw text over top of everything else
+            _spriteBatch.Begin();
+
+            string time = $"{gameTime.TotalGameTime:mm\\:ss}";
+            _spriteBatch.DrawString(Game.SmallFont, time, new Vector2(5, 5), Color.White);
+
+            string minedText = $"{_totalMinerals}/{_mineralsMined} minerals mined";
+            Vector2 minedTextLength = Game.SmallFont.MeasureString(minedText);
+            _spriteBatch.DrawString(Game.SmallFont, minedText,
+                new Vector2(Game.BackBufferWidth - 5 - minedTextLength.X, 5), Color.White);
 
             _spriteBatch.End();
         }
