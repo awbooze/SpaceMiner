@@ -21,7 +21,7 @@ namespace SpaceMiner.Sprites
         //private Texture2D boundingCircleTexture;
         private int size = 128;
         private double animationTimer;
-        private short animationFrame = 0;
+        private short animationFrame = (short)new Random().Next(63);
 
         public Vector2 Center { get; private set; }
 
