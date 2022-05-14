@@ -69,6 +69,29 @@ namespace SpaceMiner.Sprites
             // Nothing to update, but framework is here.
         }
 
+        /// <summary>
+        /// Mines the asteroid
+        /// </summary>
+        /// <returns>The number of minerals removed from the asteroid</returns>
+        public int Mine()
+        {
+            if (CurrentMinerals > 3)
+            {
+                CurrentMinerals -= 3;
+                return 3;
+            }
+            else if (CurrentMinerals > 0)
+            {
+                int toReturn = CurrentMinerals;
+                CurrentMinerals = 0;
+                return toReturn
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             // Update animation timer

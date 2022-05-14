@@ -29,6 +29,8 @@ namespace SpaceMiner.Sprites
 
         public void Update(GameTime gameTime);
 
+        public int Mine();
+
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch);
     }
 }
