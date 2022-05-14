@@ -6,14 +6,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using MonoGame.Extended.Input;
 using MonoGame.Extended.Screens;
-using MonoGame.Extended.Screens.Transitions;
 using SpaceMiner.Sprites;
 
 namespace SpaceMiner.Screens
@@ -29,6 +28,8 @@ namespace SpaceMiner.Screens
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
+        private int _totalMinerals = 0;
+        private int _mineralsMined = 0;
 
         private int levelHeight = 3200;
         private int levelWidth = 3200;
@@ -54,6 +55,12 @@ namespace SpaceMiner.Screens
             {
                 new AsteroidSprite(new Vector2(1600, 1600), 800)
             };
+
+            // Calculate total minerals available
+            foreach (IMinedSprite sprite in asteroidList)
+            {
+                _totalMinerals += sprite.CurrentMinerals;
+            }
 
             placedSpriteList = new List<IPlayerStationSprite>
             {
@@ -196,7 +203,7 @@ namespace SpaceMiner.Screens
                 Vector2 scaledMouse = Vector2.Transform(new Vector2(mousePosition.X, mousePosition.Y), Matrix.Invert(transform));
                 unplacedSprite.Center = scaledMouse;
 
-                if (Game.Input.CurrentMouseState.WasButtonJustDown(MonoGame.Extended.Input.MouseButton.Left) &&
+                if (Game.Input.CurrentMouseState.WasButtonJustDown(MouseButton.Left) &&
                     unplacedSprite.CanPlace)
                 {
                     // Place the player station sprite
