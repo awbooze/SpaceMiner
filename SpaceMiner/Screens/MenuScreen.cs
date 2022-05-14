@@ -105,7 +105,7 @@ namespace SpaceMiner.Screens
             foreach (Button menuItem in _menuItems)
             {
                 // Each entry is to be centered horizontally
-                position.X = Game.BackBufferWidth / 2 - menuItem.GetSize().X / 2;
+                position.X = Game.BackBufferWidth / 2;
 
                 // Set the entry's position
                 menuItem.Center = position;
