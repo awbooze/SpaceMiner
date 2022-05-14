@@ -57,8 +57,6 @@ namespace SpaceMiner.Sprites
 
         public List<IPlayerStationSprite> NearbyStations { get; private set; } = new List<IPlayerStationSprite>();
 
-        private MouseState currentMouseState;
-
         public SolarPowerSprite(Vector2 center)
         {
             this.Center = center;

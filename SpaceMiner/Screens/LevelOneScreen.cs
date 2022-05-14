@@ -95,8 +95,8 @@ namespace SpaceMiner.Screens
                 new SolarPowerSprite(new Vector2(1400, 1600), true, false)
             };
 
-            // Add a non-pre-placed miner (will follow the cursor)
-            unplacedSprite = new MinerSprite(new Vector2(0, 0), false, true);
+            // Don't add an unplaced sprite
+            unplacedSprite = null;
 
             Button solarButton = new Button(Game.GeneralFont, "New Solar Power Plant") 
             {
@@ -221,6 +221,8 @@ namespace SpaceMiner.Screens
                 }
             }
 
+            _mineralsMined = 0;
+
             foreach (IMinedSprite sprite in asteroidList)
             {
                 sprite.Update(gameTime);
@@ -250,6 +252,8 @@ namespace SpaceMiner.Screens
                         }
                     }
                 }
+
+                _mineralsMined += sprite.MaxMinerals - sprite.CurrentMinerals;
             }
 
             // Mouse Actions

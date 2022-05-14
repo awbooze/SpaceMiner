@@ -48,9 +48,7 @@ namespace SpaceMiner.Sprites
 
         public bool CanPlace { get; set; } = true;
 
-        private bool powered = false;
-
-        public bool Powered { get => powered; set => throw new NotImplementedException(); }
+        public bool Powered { get; set; } = false;
 
         public bool CanTransmitPower => false;
 
@@ -61,6 +59,8 @@ namespace SpaceMiner.Sprites
         public List<IPlayerStationSprite> NearbyStations { get; private set; } = new List<IPlayerStationSprite>();
 
         public List<IMinedSprite> NearbyAsteroids { get; private set; } = new List<IMinedSprite>();
+
+        private TimeSpan _lastMined = TimeSpan.Zero;
 
         public MinerSprite(Vector2 center)
         {
@@ -85,6 +85,18 @@ namespace SpaceMiner.Sprites
             {
                 CanPlace = true;
                 bounds.Center = Center;
+            }
+
+            if (NearbyStations.Count > 0)
+            {
+                Powered = true;
+            }
+
+            if (Placed && Powered && (gameTime.TotalGameTime - _lastMined).TotalSeconds > 3)
+            {
+                int asteroid = new Random().Next(NearbyAsteroids.Count);
+                NearbyAsteroids[asteroid].Mine();
+                _lastMined = gameTime.TotalGameTime;
             }
         }
 
