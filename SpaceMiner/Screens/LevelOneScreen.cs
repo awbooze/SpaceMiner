@@ -53,7 +53,17 @@ namespace SpaceMiner.Screens
             // Initialize Sprites
             asteroidList = new List<IMinedSprite>
             {
-                new AsteroidSprite(new Vector2(1600, 1600), 800)
+                new AsteroidSprite(new Vector2(1600, 1600), 800),
+                new AsteroidSprite(new Vector2(1500, 1100), 500),
+                new AsteroidSprite(new Vector2(1600, 1350), 400),
+                new AsteroidSprite(new Vector2(1700, 1675), 825),
+                new AsteroidSprite(new Vector2(1600, 1750), 1000),
+                new AsteroidSprite(new Vector2(1450, 1700), 750),
+                new AsteroidSprite(new Vector2(1450, 1800), 350),
+                new AsteroidSprite(new Vector2(1700, 1400), 900),
+                new AsteroidSprite(new Vector2(1850, 1350), 500),
+                new AsteroidSprite(new Vector2(1900, 1600), 400),
+                new AsteroidSprite(new Vector2(1200, 1600), 1000)
             };
 
             // Calculate total minerals available
