@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,6 +14,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Input;
 using MonoGame.Extended.Screens;
+using SpaceMiner.Input;
 using SpaceMiner.Sprites;
 
 namespace SpaceMiner.Screens
@@ -28,6 +30,8 @@ namespace SpaceMiner.Screens
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
+        private List<Button> _buttonList = new List<Button>();
+        private readonly InputAction _buttonSelect;
 
         private int _totalMinerals = 0;
         private int _mineralsMined = 0;
@@ -37,17 +41,25 @@ namespace SpaceMiner.Screens
         private int levelWidth = 3200;
         private float zoom = 1.5f;
 
-        private Point viewportPosition;
+        private Point _viewportCenter;
+        private Vector2 _scaledPosition;
 
         private Matrix transform;
 
         public LevelOneScreen(SpaceMinerGame game) : base(game)
         {
             // Place the current viewport in the center of the screen
-            viewportPosition = new Point(
+            _viewportCenter = new Point(
                 levelWidth / 2 - Game.BackBufferWidth / 2,
                 levelHeight / 2 - Game.BackBufferHeight / 2
             );
+
+            _buttonSelect = new InputAction(
+                new[] { Buttons.A, Buttons.Start },
+                new[] { Keys.Enter, Keys.Space },
+                new[] { MouseButton.Left },
+                true
+             );
         }
         
         public override void Initialize()
@@ -86,7 +98,33 @@ namespace SpaceMiner.Screens
             // Add a non-pre-placed miner (will follow the cursor)
             unplacedSprite = new MinerSprite(new Vector2(0, 0), false, true);
 
+            Button solarButton = new Button(Game.GeneralFont, "New Solar Power Plant") 
+            {
+                Center = new Vector2(200, Game.BackBufferHeight - 15)
+            };
+            solarButton.Selected += SolarButton_Selected;
+            _buttonList.Add(solarButton);
+
+            Button minerButton = new Button(Game.GeneralFont, "New Miner")
+            {
+                Center = new Vector2(450, Game.BackBufferHeight - 15)
+            };
+            minerButton.Selected += MinerButton_Selected;
+            _buttonList.Add(minerButton);
+
             base.Initialize();
+        }
+
+        private void SolarButton_Selected(object sender, EventArgs e)
+        {
+            unplacedSprite = new SolarPowerSprite(_scaledPosition, false, true);
+            unplacedSprite.LoadContent(Content);
+        }
+
+        private void MinerButton_Selected(object sender, EventArgs e)
+        {
+            unplacedSprite = new MinerSprite(_scaledPosition, false, true);
+            unplacedSprite.LoadContent(Content);
         }
 
         public override void LoadContent()
@@ -119,7 +157,7 @@ namespace SpaceMiner.Screens
 
         public override void Update(GameTime gameTime)
         {
-            // Respond to Zoom inputs
+            // Respond to mouse inputs
             if (Game.Input.CurrentMouseState.DeltaScrollWheelValue != 0)
             {
                 zoom -= ((float)Game.Input.CurrentMouseState.DeltaScrollWheelValue) / 2400;
@@ -133,6 +171,9 @@ namespace SpaceMiner.Screens
                     zoom = 5f;
                 }
             }
+
+            Point mousePosition = Game.Input.Position;
+            _scaledPosition = Vector2.Transform(new Vector2(mousePosition.X, mousePosition.Y), Matrix.Invert(transform));
 
             // Update logic here
             if (unplacedSprite != null)
@@ -214,9 +255,7 @@ namespace SpaceMiner.Screens
             // Mouse Actions
             if (unplacedSprite != null)
             {
-                Point mousePosition = Game.Input.CurrentMouseState.Position;
-                Vector2 scaledMouse = Vector2.Transform(new Vector2(mousePosition.X, mousePosition.Y), Matrix.Invert(transform));
-                unplacedSprite.Center = scaledMouse;
+                unplacedSprite.Center = _scaledPosition;
 
                 if (Game.Input.CurrentMouseState.WasButtonJustDown(MouseButton.Left) &&
                     unplacedSprite.CanPlace)
@@ -230,7 +269,19 @@ namespace SpaceMiner.Screens
                     if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
                     {
                         // Place multiple sprites, so create another one
-                        unplacedSprite = new MinerSprite(scaledMouse, false, true);
+                        if (unplacedSprite is MinerSprite)
+                        {
+                            unplacedSprite = new MinerSprite(_scaledPosition, false, true);
+                        }
+                        else if (unplacedSprite is SolarPowerSprite)
+                        {
+                            unplacedSprite = new SolarPowerSprite(_scaledPosition, false, true);
+                        }
+                        else
+                        {
+                            // TODO: Make sure to handle this if I add another type of sprite!
+                            unplacedSprite = null;
+                        }
                         unplacedSprite.LoadContent(Content);
                     }
                     else
@@ -244,16 +295,35 @@ namespace SpaceMiner.Screens
             if (Game.Input.CurrentMouseState.RightButton == ButtonState.Pressed)
             {
                 // Move the background
-                viewportPosition += Game.Input.CurrentMouseState.DeltaPosition;
+                _viewportCenter += Game.Input.CurrentMouseState.DeltaPosition;
+            }
+
+            // Update buttons
+            if (_buttonSelect.Occurred(Game.Input))
+            {
+                _buttonList.FirstOrDefault(b => b.Hovered)?.OnSelectEntry();
+            }
+
+            foreach (Button button in _buttonList)
+            {
+                if (button.Bounds.CollidesWith(Game.Input.Position))
+                {
+                    button.Hovered = true;
+                }
+                else
+                {
+                    button.Hovered = false;
+                }
+                button.Update(gameTime);
             }
         }
 
         public override void Draw(GameTime gameTime)
         {
             // Update matrix transformations
-            Matrix zoomTranslation = Matrix.CreateTranslation(-viewportPosition.X - Game.BackBufferWidth / 2, -viewportPosition.Y - Game.BackBufferHeight / 2, 0);
+            Matrix zoomTranslation = Matrix.CreateTranslation(-_viewportCenter.X - Game.BackBufferWidth / 2, -_viewportCenter.Y - Game.BackBufferHeight / 2, 0);
             Matrix zoomScale = Matrix.CreateScale(zoom);
-            Matrix viewportTranslation = Matrix.CreateTranslation(-viewportPosition.X, -viewportPosition.Y, 0);
+            Matrix viewportTranslation = Matrix.CreateTranslation(-_viewportCenter.X, -_viewportCenter.Y, 0);
             transform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation) * viewportTranslation;
 
             // Draw Tilemap without transformations underneath everything
@@ -293,6 +363,11 @@ namespace SpaceMiner.Screens
             Vector2 minedTextLength = Game.SmallFont.MeasureString(minedText);
             _spriteBatch.DrawString(Game.SmallFont, minedText,
                 new Vector2(Game.BackBufferWidth - 5 - minedTextLength.X, 5), Color.White);
+
+            foreach (Button button in _buttonList)
+            {
+                button.Draw(gameTime, _spriteBatch);
+            }
 
             _spriteBatch.End();
         }
