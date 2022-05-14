@@ -359,7 +359,7 @@ namespace SpaceMiner.Screens
             string time = $"{gameTime.TotalGameTime:mm\\:ss}";
             _spriteBatch.DrawString(Game.SmallFont, time, new Vector2(5, 5), Color.White);
 
-            string minedText = $"{_totalMinerals}/{_mineralsMined} minerals mined";
+            string minedText = $"{_mineralsMined}/{_totalMinerals} minerals mined";
             Vector2 minedTextLength = Game.SmallFont.MeasureString(minedText);
             _spriteBatch.DrawString(Game.SmallFont, minedText,
                 new Vector2(Game.BackBufferWidth - 5 - minedTextLength.X, 5), Color.White);
