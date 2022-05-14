@@ -18,7 +18,7 @@ namespace SpaceMiner.Sprites
     {
         private Texture2D texture;
 
-        private Vector2 center;
+        public Vector2 Center { get; set; }
 
         private BoundingRectangle bounds;
 
@@ -61,7 +61,7 @@ namespace SpaceMiner.Sprites
 
         public SolarPowerSprite(Vector2 center)
         {
-            this.center = center;
+            this.Center = center;
             this.Bounds = new BoundingRectangle(center, 64);
         }
 
@@ -80,10 +80,8 @@ namespace SpaceMiner.Sprites
         {
             if (Selected && !Placed)
             {
-                currentMouseState = Mouse.GetState();
                 CanPlace = true;
-                center = new Vector2(currentMouseState.X, currentMouseState.Y);
-                Bounds.Center = center;
+                bounds.Center = Center;
             }
         }
 
@@ -95,7 +93,7 @@ namespace SpaceMiner.Sprites
             }
 
             Color drawColor = (Placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
-            spriteBatch.Draw(texture, center - new Vector2(bounds.Width / 2, bounds.Height / 2), drawColor);
+            spriteBatch.Draw(texture, Center - new Vector2(bounds.Width / 2, bounds.Height / 2), drawColor);
         }
 
         public override bool Equals(object obj)
@@ -114,7 +112,7 @@ namespace SpaceMiner.Sprites
         {
             if (otherSprite is SolarPowerSprite otherPower)
             {
-                return otherPower.center == this.center;
+                return otherPower.Center == this.Center;
             }
             else
             {

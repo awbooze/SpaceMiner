@@ -24,16 +24,27 @@ namespace SpaceMiner.Screens
 
         private SpriteBatch _spriteBatch;
 
-        private Texture2D oRing;
         private SoundEffect placeSprite;
 
         private List<IMinedSprite> asteroidList = new List<IMinedSprite>();
         private List<IPlayerStationSprite> placedSpriteList = new List<IPlayerStationSprite>();
         private IPlayerStationSprite unplacedSprite = null;
 
+        private int levelHeight = 3200;
+        private int levelWidth = 3200;
+        private float zoom = 1.5f;
+
+        private Point viewportPosition;
+
+        private Matrix transform;
+
         public LevelOneScreen(SpaceMinerGame game) : base(game)
         {
-            // Nothing here
+            // Place the current viewport in the center of the screen
+            viewportPosition = new Point(
+                levelWidth / 2 - Game.BackBufferWidth / 2,
+                levelHeight / 2 - Game.BackBufferHeight / 2
+            );
         }
         
         public override void Initialize()
@@ -41,13 +52,13 @@ namespace SpaceMiner.Screens
             // Initialize Sprites
             asteroidList = new List<IMinedSprite>
             {
-                new AsteroidSprite(new Vector2(550, 250), 800)
+                new AsteroidSprite(new Vector2(1600, 1600), 800)
             };
 
             placedSpriteList = new List<IPlayerStationSprite>
             {
                 // Add a pre-placed solar power sprite
-                new SolarPowerSprite(new Vector2(400, 200), true, false)
+                new SolarPowerSprite(new Vector2(1400, 1600), true, false)
             };
 
             // Add a non-pre-placed miner (will follow the cursor)
@@ -76,7 +87,6 @@ namespace SpaceMiner.Screens
                 unplacedSprite.LoadContent(Content);
             }
 
-            oRing = Content.Load<Texture2D>("Sprites/O-Ring Ship");
             placeSprite = Content.Load<SoundEffect>("Effects/blg_a_robo_08");
 
             // Lower the volume a bit so that people can hear sound effects
@@ -87,6 +97,21 @@ namespace SpaceMiner.Screens
 
         public override void Update(GameTime gameTime)
         {
+            // Respond to Zoom inputs
+            if (Game.Input.CurrentMouseState.DeltaScrollWheelValue != 0)
+            {
+                zoom -= ((float)Game.Input.CurrentMouseState.DeltaScrollWheelValue) / 2400;
+
+                if (zoom < 0.1f)
+                {
+                    zoom = 0.1f;
+                }
+                else if (zoom > 5f)
+                {
+                    zoom = 5f;
+                }
+            }
+
             // Update logic here
             if (unplacedSprite != null)
             {
@@ -164,35 +189,58 @@ namespace SpaceMiner.Screens
                 }
             }
 
-            if (Game.Input.CurrentMouseState.WasButtonJustDown(MonoGame.Extended.Input.MouseButton.Left)
-                && unplacedSprite != null && unplacedSprite.CanPlace)
+            // Mouse Actions
+            if (unplacedSprite != null)
             {
-                // Place the player station sprite
-                unplacedSprite.Placed = true;
-                unplacedSprite.Selected = false;
-                placedSpriteList.Add(unplacedSprite);
-                placeSprite.Play(1.0f, 0, 0);
+                Point mousePosition = Game.Input.CurrentMouseState.Position;
+                Vector2 scaledMouse = Vector2.Transform(new Vector2(mousePosition.X, mousePosition.Y), Matrix.Invert(transform));
+                unplacedSprite.Center = scaledMouse;
 
-                if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
+                if (Game.Input.CurrentMouseState.WasButtonJustDown(MonoGame.Extended.Input.MouseButton.Left) &&
+                    unplacedSprite.CanPlace)
                 {
-                    // Place multiple sprites, so create another one
-                    unplacedSprite = new MinerSprite(new Vector2(Game.Input.CurrentMouseState.X, Game.Input.CurrentMouseState.Y), false, true);
-                    unplacedSprite.LoadContent(Content);
+                    // Place the player station sprite
+                    unplacedSprite.Placed = true;
+                    unplacedSprite.Selected = false;
+                    placedSpriteList.Add(unplacedSprite);
+                    placeSprite.Play(1.0f, 0, 0);
+
+                    if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.LeftShift))
+                    {
+                        // Place multiple sprites, so create another one
+                        unplacedSprite = new MinerSprite(scaledMouse, false, true);
+                        unplacedSprite.LoadContent(Content);
+                    }
+                    else
+                    {
+                        // Only place one sprite
+                        unplacedSprite = null;
+                    }
                 }
-                else
-                {
-                    // Only place one sprite
-                    unplacedSprite = null;
-                }
+            }
+            
+            if (Game.Input.CurrentMouseState.RightButton == ButtonState.Pressed)
+            {
+                // Move the background
+                viewportPosition += Game.Input.CurrentMouseState.DeltaPosition;
             }
         }
 
         public override void Draw(GameTime gameTime)
         {
-            // Draw inside spritebatch calls
-            _spriteBatch.Begin();
+            // Update matrix transformations
+            Matrix zoomTranslation = Matrix.CreateTranslation(-viewportPosition.X - Game.BackBufferWidth / 2, -viewportPosition.Y - Game.BackBufferHeight / 2, 0);
+            Matrix zoomScale = Matrix.CreateScale(zoom);
+            Matrix viewportTranslation = Matrix.CreateTranslation(-viewportPosition.X, -viewportPosition.Y, 0);
+            transform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation) * viewportTranslation;
 
+            // Draw Tilemap without transformations
+            _spriteBatch.Begin();
             Game.Tilemap.Draw(gameTime, _spriteBatch);
+            _spriteBatch.End();
+
+            // Draw inside spritebatch calls
+            _spriteBatch.Begin(transformMatrix: transform);
 
             foreach (IMinedSprite sprite in asteroidList)
             {
@@ -210,9 +258,6 @@ namespace SpaceMiner.Screens
                 // Draw the unplaced sprite, if it exists
                 unplacedSprite.Draw(Game, gameTime, _spriteBatch);
             }
-
-            // Draw the sprites I haven't abstracted yet
-            _spriteBatch.Draw(oRing, new Vector2(800, 100), new Rectangle(0, 0, 64, 64), Color.White);
 
             _spriteBatch.End();
         }

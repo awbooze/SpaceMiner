@@ -21,7 +21,7 @@ namespace SpaceMiner.Sprites
     {
         private Texture2D texture;
 
-        private Vector2 center;
+        public Vector2 Center { get; set; }
 
         private BoundingCircle bounds;
 
@@ -62,11 +62,9 @@ namespace SpaceMiner.Sprites
 
         public List<IMinedSprite> NearbyAsteroids { get; private set; } = new List<IMinedSprite>();
 
-        private MouseState currentMouseState;
-
         public MinerSprite(Vector2 center)
         {
-            this.center = center;
+            this.Center = center;
             this.Bounds = new BoundingCircle(center, 16);
         }
 
@@ -85,10 +83,8 @@ namespace SpaceMiner.Sprites
         {
             if (Selected && !Placed)
             {
-                currentMouseState = Mouse.GetState();
                 CanPlace = true;
-                center = new Vector2(currentMouseState.X, currentMouseState.Y);
-                Bounds.Center = center;
+                bounds.Center = Center;
             }
         }
 
@@ -105,7 +101,7 @@ namespace SpaceMiner.Sprites
             }
 
             Color drawColor = (Placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
-            spriteBatch.Draw(texture, center - new Vector2(bounds.Radius, bounds.Radius), drawColor);
+            spriteBatch.Draw(texture, Center - new Vector2(bounds.Radius, bounds.Radius), drawColor);
         }
 
         public override bool Equals(object obj)
@@ -124,7 +120,7 @@ namespace SpaceMiner.Sprites
         {
             if (otherSprite is MinerSprite otherMiner)
             {
-                return otherMiner.center == this.center;
+                return otherMiner.Center == this.Center;
             }
             else
             {
