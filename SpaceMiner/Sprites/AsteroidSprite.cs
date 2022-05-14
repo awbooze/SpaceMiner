@@ -84,7 +84,7 @@ namespace SpaceMiner.Sprites
             {
                 int toReturn = CurrentMinerals;
                 CurrentMinerals = 0;
-                return toReturn
+                return toReturn;
             }
             else
             {
