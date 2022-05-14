@@ -7,6 +7,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.Input;
+using System;
 
 namespace SpaceMiner.Input
 {
@@ -35,6 +36,8 @@ namespace SpaceMiner.Input
         /// The current tick's GamePadState.
         /// </summary>
         public GamePadState CurrentGamePadState { get; private set; }
+
+        public Point Position { get; private set; }
         #endregion
 
         public InputState()
@@ -53,6 +56,15 @@ namespace SpaceMiner.Input
 
             PriorGamePadState = CurrentGamePadState;
             CurrentGamePadState = GamePad.GetState(PlayerIndex.One);
+
+            if (CurrentMouseState.PositionChanged)
+            {
+                Position = CurrentMouseState.Position;
+            }
+            else if (Math.Abs(CurrentGamePadState.ThumbSticks.Left.X) > 0.1 || Math.Abs(CurrentGamePadState.ThumbSticks.Left.Y) > 0.1)
+            {
+                Position += CurrentGamePadState.ThumbSticks.Left.ToPoint();
+            }
         }
 
         /// <summary>
