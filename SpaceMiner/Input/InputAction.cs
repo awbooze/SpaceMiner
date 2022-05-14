@@ -26,7 +26,7 @@ namespace SpaceMiner.Input
         private delegate bool MouseButtonPress(MouseButton button);
 
         /// <summary>
-        /// Constructs a new InputMapping by binding the suppled input options to the action
+        /// Constructs a new InputMapping by binding the supplied input options to the action
         /// </summary>
         /// <param name="triggerButtons">The buttons that trigger this action</param>
         /// <param name="triggerKeys">The keys that trigger this action</param>
@@ -58,8 +58,8 @@ namespace SpaceMiner.Input
             if (_firstPressOnly)
             {
                 buttonTest = stateToTest.IsNewGamePadButtonPress;
-                keyTest = stateToTest.CurrentKeyboardState.WasKeyJustDown;
-                mouseTest = stateToTest.CurrentMouseState.WasButtonJustDown;
+                keyTest = stateToTest.CurrentKeyboardState.WasKeyJustUp;
+                mouseTest = stateToTest.CurrentMouseState.WasButtonJustUp;
             }
             else
             {

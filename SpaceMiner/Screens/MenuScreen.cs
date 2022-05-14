@@ -7,66 +7,138 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MonoGame.Extended.Input;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
+using SpaceMiner.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SpaceMiner.Screens
 {
     public class MenuScreen : GameScreen
     {
-        private new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
+        public new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
 
-        private SpriteBatch _spriteBatch;
-        private SpriteFont orbitron;
-        private SpriteFont exo;
+        public SpriteBatch SpriteBatch { get; private set; }
 
-        private Vector2 titlePosition;
-        private Vector2 instructionPosition;
-        private string instructions = "Press Enter to Start";
+        private Vector2 _titlePosition;
+
+        private readonly List<Button> _menuItems = new List<Button>();
+        private readonly InputAction _menuSelect;
+        private readonly InputAction _menuCancel;
 
         public MenuScreen(SpaceMinerGame game) : base(game)
         {
-            // Nothing to call here
+            _menuSelect = new InputAction(
+                new[] { Buttons.A, Buttons.Start },
+                new[] { Keys.Enter, Keys.Space },
+                new[] { MouseButton.Left },
+                true
+             );
+            _menuCancel = new InputAction(
+                new[] { Buttons.B, Buttons.Back },
+                new[] { Keys.Back, Keys.Escape },
+                null,
+                true
+            );
+
+            Button playItem = new Button(Game.GeneralFont, "Level 1");
+            Button exitItem = new Button(Game.GeneralFont, "Exit");
+
+            playItem.Selected += PlayGameMenuItemSelected;
+            exitItem.Selected += ExitMenuItemSelected;
+
+            _menuItems.Add(playItem);
+            _menuItems.Add(exitItem);
+        }
+
+        private void PlayGameMenuItemSelected(object sender, EventArgs e)
+        {
+            ScreenManager.LoadScreen(new LevelOneScreen(Game));
+        }
+
+        private void ExitMenuItemSelected(object sender, EventArgs e)
+        {
+            Game.Exit();
         }
 
         public override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Load fonts
-            orbitron = Content.Load<SpriteFont>("Fonts/Orbitron");
-            exo = Content.Load<SpriteFont>("Fonts/Exo");
-
-            // Calculate sizes
-            Vector2 titleSize = orbitron.MeasureString(Game.GameTitle);
-            titlePosition = new Vector2((Game.BackBufferWidth / 2) - (titleSize.X / 2), 5);
-
-            Vector2 instructionSize = exo.MeasureString(instructions);
-            instructionPosition = new Vector2((Game.BackBufferWidth / 2) - (instructionSize.X / 2),
-                (Game.BackBufferHeight / 2) - (instructionSize.Y / 2));
+            // Calculate title size
+            Vector2 titleSize = Game.TitleFont.MeasureString(Game.GameTitle);
+            _titlePosition = new Vector2((Game.BackBufferWidth / 2) - (titleSize.X / 2), 5);
 
             base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (Game.Input.CurrentKeyboardState.IsKeyDown(Keys.Enter))
+            // Make sure our entries are in the right place before we draw them
+            UpdateMenuEntryLocations();
+
+            if (_menuSelect.Occurred(Game.Input))
             {
-                ScreenManager.LoadScreen(new LevelOneScreen(Game));
+                _menuItems.FirstOrDefault(b => b.Hovered)?.OnSelectEntry();
+            }
+            else if (_menuCancel.Occurred(Game.Input))
+            {
+                Game.Exit();
+            }
+
+            // Update each nested MenuEntry object
+            for (int i = 0; i < _menuItems.Count; i++)
+            {
+                _menuItems[i].Update(gameTime);
+            }
+        }
+
+        private void UpdateMenuEntryLocations()
+        {
+            // Start at Y = 200; each X value is generated per entry
+            var position = new Vector2(0f, 200f);
+
+            // Update each menu entry's location in turn
+            foreach (Button menuItem in _menuItems)
+            {
+                // Each entry is to be centered horizontally
+                position.X = Game.BackBufferWidth / 2 - menuItem.GetSize().X / 2;
+
+                // Set the entry's position
+                menuItem.Center = position;
+
+                // Move down for the next entry the size of this entry
+                position.Y += menuItem.GetSize().Y;
+
+                if (menuItem.Bounds.CollidesWith(Game.Input.Position))
+                {
+                    menuItem.Hovered = true;
+                }
+                else
+                {
+                    menuItem.Hovered = false;
+                }
             }
         }
 
         public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin();
+            SpriteBatch.Begin();
 
-            Game.Tilemap.Draw(gameTime, _spriteBatch);
+            Game.Tilemap.Draw(gameTime, SpriteBatch);
 
-            _spriteBatch.DrawString(orbitron, Game.GameTitle, titlePosition, Color.White);
-            _spriteBatch.DrawString(exo, instructions, instructionPosition, Color.White);
-            _spriteBatch.DrawString(exo, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
+            for (int i = 0; i < _menuItems.Count; i++)
+            {
+                _menuItems[i].Draw(gameTime, SpriteBatch);
+            }
 
-            _spriteBatch.End();
+            SpriteBatch.DrawString(Game.TitleFont, Game.GameTitle, _titlePosition, Color.White);
+            SpriteBatch.DrawString(Game.GeneralFont, "To exit, hit escape (or the back button on a controller)", new Vector2(5, 505), Color.White);
+
+            SpriteBatch.End();
         }
     }
 }

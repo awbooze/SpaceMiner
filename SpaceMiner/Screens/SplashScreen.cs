@@ -14,11 +14,9 @@ namespace SpaceMiner.Screens
 {
     public class SplashScreen : GameScreen
     {
-        private new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
+        public new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
 
         private SpriteBatch _spriteBatch;
-        private SpriteFont orbitron;
-        private SpriteFont exo;
 
         private Vector2 titlePosition;
         private Vector2 loadingPosition;
@@ -35,15 +33,11 @@ namespace SpaceMiner.Screens
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // Load fonts
-            orbitron = Content.Load<SpriteFont>("Fonts/Orbitron");
-            exo = Content.Load<SpriteFont>("Fonts/Exo");
-
             // Calculate sizes
-            Vector2 titleSize = orbitron.MeasureString(Game.GameTitle);
+            Vector2 titleSize = Game.TitleFont.MeasureString(Game.GameTitle);
             titlePosition = new Vector2((Game.BackBufferWidth / 2) - (titleSize.X / 2), 5);
 
-            Vector2 loadingSize = exo.MeasureString(loading);
+            Vector2 loadingSize = Game.GeneralFont.MeasureString(loading);
             loadingPosition = new Vector2((Game.BackBufferWidth / 2) - (loadingSize.X / 2),
                 (Game.BackBufferHeight) - (loadingSize.Y));
 
@@ -65,8 +59,8 @@ namespace SpaceMiner.Screens
 
             Game.Tilemap.Draw(gameTime, _spriteBatch);
 
-            _spriteBatch.DrawString(orbitron, Game.GameTitle, titlePosition, Color.White);
-            _spriteBatch.DrawString(exo, loading, loadingPosition, Color.White);
+            _spriteBatch.DrawString(Game.TitleFont, Game.GameTitle, titlePosition, Color.White);
+            _spriteBatch.DrawString(Game.GeneralFont, loading, loadingPosition, Color.White);
 
             _spriteBatch.End();
         }

@@ -20,7 +20,7 @@ namespace SpaceMiner.Screens
 {
     public class LevelOneScreen : GameScreen
     {
-        private new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
+        public new SpaceMinerGame Game => (SpaceMinerGame)base.Game;
 
         private SpriteBatch _spriteBatch;
 
@@ -196,7 +196,7 @@ namespace SpaceMiner.Screens
                 Vector2 scaledMouse = Vector2.Transform(new Vector2(mousePosition.X, mousePosition.Y), Matrix.Invert(transform));
                 unplacedSprite.Center = scaledMouse;
 
-                if (Game.Input.CurrentMouseState.LeftButton == ButtonState.Pressed &&
+                if (Game.Input.CurrentMouseState.WasButtonJustDown(MonoGame.Extended.Input.MouseButton.Left) &&
                     unplacedSprite.CanPlace)
                 {
                     // Place the player station sprite

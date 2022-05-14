@@ -60,6 +60,18 @@ namespace SpaceMiner.Collisions
         }
 
         /// <summary>
+        /// A constructor for a BoundingRectangle that takes a center and a size.
+        /// </summary>
+        /// <param name="center">The center of this BoundingRectangle.</param>
+        /// <param name="size">The size of this BoundingRectangle.</param>
+        public BoundingRectangle(Vector2 center, Vector2 size)
+        {
+            Center = center;
+            Width = size.X;
+            Height = size.Y;
+        }
+
+        /// <summary>
         /// Checks if this BoundingRectangle is colliding with another IBounding object. Draws on ideas 
         /// given in the course examples, but is substantially different in operation.
         /// </summary>
@@ -80,6 +92,18 @@ namespace SpaceMiner.Collisions
             {
                 throw new NotImplementedException("Other Bounding Shapes have not yet been implemented.");
             }
+        }
+
+        /// <summary>
+        /// Checks if this BoundingRectangle is colliding with a point. Should only be used for 
+        /// checking if input is happening, but may have other functions down the road.
+        /// </summary>
+        /// <param name="point">The point this may be colliding with.</param>
+        /// <returns>true if the two objects are colliding, false otherwise.</returns>
+        public bool CollidesWith(Point point)
+        {
+            return point.X >= this.Left && point.X <= this.Right && 
+                point.Y >= this.Top && point.Y <= this.Bottom;
         }
     }
 }
