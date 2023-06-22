@@ -73,12 +73,12 @@ namespace SpaceMiner.Sprites
         /// Mines the asteroid
         /// </summary>
         /// <returns>The number of minerals removed from the asteroid</returns>
-        public int Mine()
+        public int Mine(int amount)
         {
-            if (CurrentMinerals > 3)
+            if (CurrentMinerals > amount)
             {
-                CurrentMinerals -= 3;
-                return 3;
+                CurrentMinerals -= amount;
+                return amount;
             }
             else if (CurrentMinerals > 0)
             {

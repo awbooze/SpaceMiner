@@ -60,7 +60,15 @@ namespace SpaceMiner.Sprites
 
         public List<IMinedSprite> NearbyAsteroids { get; private set; } = new List<IMinedSprite>();
 
-        private TimeSpan _lastMined = TimeSpan.Zero;
+        public int AmountToMine => 3;
+
+        private readonly int mineDelayTime = 3;
+
+        private int asteroidToMine = -1;
+
+        private double timeSinceLastMined;
+
+        private TimeSpan lastMined = TimeSpan.Zero;
 
         public MinerSprite(Vector2 center)
         {
@@ -92,24 +100,34 @@ namespace SpaceMiner.Sprites
                 Powered = true;
             }
 
-            if (Placed && Powered && (gameTime.TotalGameTime - _lastMined).TotalSeconds > 3)
+            if (Placed && Powered)
             {
-                int asteroid = new Random().Next(NearbyAsteroids.Count);
-                NearbyAsteroids[asteroid].Mine();
-                _lastMined = gameTime.TotalGameTime;
+                timeSinceLastMined = (gameTime.TotalGameTime - lastMined).TotalSeconds;
+
+                if (timeSinceLastMined > mineDelayTime)
+                {
+                    asteroidToMine = new Random().Next(NearbyAsteroids.Count);
+                    NearbyAsteroids[asteroidToMine].Mine(AmountToMine);
+                    lastMined = gameTime.TotalGameTime;
+                }
             }
         }
 
         public void Draw(SpaceMinerGame game, GameTime gameTime, SpriteBatch spriteBatch)
         {
-            foreach (IPlayerStationSprite sprite in NearbyStations)
+            if (!Placed)
             {
-                game.DrawLine(spriteBatch, bounds.Center, sprite.Bounds.Center, Color.Blue);
+                // Display all of the possible asteroids this miner could mine if it's not placed.
+                foreach (IMinedSprite sprite in NearbyAsteroids)
+                {
+                    game.DrawLine(spriteBatch, bounds.Center, sprite.Bounds.Center, Color.Red);
+                }
             }
-
-            foreach (IMinedSprite sprite in NearbyAsteroids)
+            else if (asteroidToMine > -1 && asteroidToMine < NearbyAsteroids.Count)
             {
-                game.DrawLine(spriteBatch, bounds.Center, sprite.Bounds.Center, Color.Red);
+                IMinedSprite sprite = NearbyAsteroids[asteroidToMine];
+                float alpha = (float)(timeSinceLastMined / mineDelayTime);
+                game.DrawLine(spriteBatch, bounds.Center, sprite.Bounds.Center, Color.Lerp(Color.Red, Color.Transparent, alpha));
             }
 
             Color drawColor = (Placed) ? Color.White : (CanPlace) ? Color.Gray : Color.Red;
